@@ -108,6 +108,27 @@ func (p PathList) Rotate(rx, ry, rz float64) {
 	}
 }
 
+// ScaleX scales this pathlist on the x-axis, in place.
+func (p PathList) ScaleX(scale float64) {
+	for _, path := range p {
+		path.ScaleX(scale)
+	}
+}
+
+// ScaleY scales this pathlist on the y-axis, in place.
+func (p PathList) ScaleY(scale float64) {
+	for _, path := range p {
+		path.ScaleY(scale)
+	}
+}
+
+// ScaleZ scales this pathlist on the z-axis, in place.
+func (p PathList) ScaleZ(scale float64) {
+	for _, path := range p {
+		path.ScaleZ(scale)
+	}
+}
+
 // Scale scales this pathlist in place.
 func (p PathList) Scale(sx, sy, sz float64) {
 	for _, list := range p {
@@ -186,6 +207,27 @@ func (p PathList) RotatedZ(angle float64) PathList {
 func (p PathList) Rotated(rx, ry, rz float64) PathList {
 	p1 := p.Clone()
 	p1.Rotate(rx, ry, rz)
+	return p1
+}
+
+// ScaledX returns a copy of this pathlist, scaled on the x-axis.
+func (p PathList) ScaledX(scale float64) PathList {
+	p1 := p.Clone()
+	p1.ScaleX(scale)
+	return p1
+}
+
+// ScaledY returns a copy of this pathlist, scaled on the y-axis.
+func (p PathList) ScaledY(scale float64) PathList {
+	p1 := p.Clone()
+	p1.ScaleY(scale)
+	return p1
+}
+
+// ScaledZ returns a copy of this pathlist, scaled on the z-axis.
+func (p PathList) ScaledZ(scale float64) PathList {
+	p1 := p.Clone()
+	p1.ScaleZ(scale)
 	return p1
 }
 

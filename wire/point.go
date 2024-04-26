@@ -92,6 +92,21 @@ func (p *Point) Rotate(rx, ry, rz float64) {
 	p.RotateZ(rz)
 }
 
+// ScaleX scales this point on the x-axis, in place.
+func (p *Point) ScaleX(scale float64) {
+	p.X *= scale
+}
+
+// ScaleY scales this point on the y-axis, in place.
+func (p *Point) ScaleY(scale float64) {
+	p.Y *= scale
+}
+
+// ScaleZ scales this point on the z-axis, in place.
+func (p *Point) ScaleZ(scale float64) {
+	p.Z *= scale
+}
+
 // Scale scales this point in place.
 func (p *Point) Scale(sx, sy, sz float64) {
 	p.X *= sx
@@ -170,6 +185,27 @@ func (p *Point) RotatedZ(angle float64) *Point {
 func (p *Point) Rotated(rx, ry, rz float64) *Point {
 	p1 := p.Clone()
 	p1.Rotate(rx, ry, rz)
+	return p1
+}
+
+// ScaledX scales this point on the x-axis, in place.
+func (p *Point) ScaledX(scale float64) *Point {
+	p1 := p.Clone()
+	p1.ScaleX(scale)
+	return p1
+}
+
+// ScaledY scales this point on the y-axis, in place.
+func (p *Point) ScaledY(scale float64) *Point {
+	p1 := p.Clone()
+	p1.ScaleY(scale)
+	return p1
+}
+
+// ScaledZ scales this point on the z-axis, in place.
+func (p *Point) ScaledZ(scale float64) *Point {
+	p1 := p.Clone()
+	p1.ScaleY(scale)
 	return p1
 }
 

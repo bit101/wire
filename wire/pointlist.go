@@ -111,6 +111,27 @@ func (p PointList) Rotate(rx, ry, rz float64) {
 	}
 }
 
+// ScaleX scales this pointlist on the x-axis, in place.
+func (p PointList) ScaleX(scale float64) {
+	for _, point := range p {
+		point.ScaleX(scale)
+	}
+}
+
+// ScaleY scales this pointlist on the y-axis, in place.
+func (p PointList) ScaleY(scale float64) {
+	for _, point := range p {
+		point.ScaleY(scale)
+	}
+}
+
+// ScaleZ scales this pointlist on the z-axis, in place.
+func (p PointList) ScaleZ(scale float64) {
+	for _, point := range p {
+		point.ScaleZ(scale)
+	}
+}
+
 // Scale scales this pointlist in place.
 func (p PointList) Scale(sx, sy, sz float64) {
 	for _, point := range p {
@@ -189,6 +210,27 @@ func (p PointList) RotatedZ(angle float64) PointList {
 func (p PointList) Rotated(rx, ry, rz float64) PointList {
 	p1 := p.Clone()
 	p1.Rotate(rx, ry, rz)
+	return p1
+}
+
+// ScaledX returns a copy of this pointlist, scaled on the x-axis.
+func (p PointList) ScaledX(scale float64) PointList {
+	p1 := p.Clone()
+	p1.ScaleX(scale)
+	return p1
+}
+
+// ScaledY returns a copy of this pointlist, scaled on the x-axis.
+func (p PointList) ScaledY(scale float64) PointList {
+	p1 := p.Clone()
+	p1.ScaleY(scale)
+	return p1
+}
+
+// ScaledZ returns a copy of this pointlist, scaled on the x-axis.
+func (p PointList) ScaledZ(scale float64) PointList {
+	p1 := p.Clone()
+	p1.ScaleZ(scale)
 	return p1
 }
 

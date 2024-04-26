@@ -34,7 +34,7 @@ var (
 
 func init() {
 	box = wire.Box()
-	box.Scale(160, 160, 160)
+	box.UniScale(160)
 	cyl = wire.Cylinder(20, 24)
 	cyl.Scale(50, 200, 50)
 	cyl.Randomize(5)
@@ -43,7 +43,7 @@ func init() {
 	torus.Randomize(5)
 
 	sphere = wire.Sphere(100, 100)
-	sphere.Scale(200, 200, 200)
+	sphere.UniScale(200)
 	sphere.Randomize(20)
 }
 
