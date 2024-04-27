@@ -13,7 +13,7 @@ type Point struct {
 	X, Y, Z float64
 }
 
-// NewPoint creates a new Point.
+// NewPoint creates a new point.
 func NewPoint(x, y, z float64) *Point {
 	return &Point{x, y, z}
 }
@@ -84,6 +84,13 @@ func (p *Point) Scale(sx, sy, sz float64) {
 	p.Z *= sz
 }
 
+// UniScale scales this point in place.
+func (p *Point) UniScale(scale float64) {
+	p.X *= scale
+	p.Y *= scale
+	p.Z *= scale
+}
+
 // Randomize randomizes this point in place.
 func (p *Point) Randomize(amount float64) {
 	p.X += random.FloatRange(-amount, amount)
@@ -133,7 +140,14 @@ func (p *Point) Rotated(rx, ry, rz float64) *Point {
 // Scaled returns a copy of this point, scaled.
 func (p *Point) Scaled(sx, sy, sz float64) *Point {
 	p1 := p.Clone()
-	p1.Rotate(sx, sy, sz)
+	p1.Scale(sx, sy, sz)
+	return p1
+}
+
+// UniScaled returns a copy of this point, scaled.
+func (p *Point) UniScaled(scale float64) *Point {
+	p1 := p.Clone()
+	p1.UniScale(scale)
 	return p1
 }
 

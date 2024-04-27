@@ -94,6 +94,13 @@ func (p PathList) Scale(sx, sy, sz float64) {
 	}
 }
 
+// UniScale scales this pathlist in place.
+func (p PathList) UniScale(scale float64) {
+	for _, list := range p {
+		list.UniScale(scale)
+	}
+}
+
 // Randomize randomizes this pathlist in place.
 func (p PathList) Randomize(amount float64) {
 	for _, list := range p {
@@ -144,6 +151,13 @@ func (p PathList) Rotated(rx, ry, rz float64) PathList {
 func (p PathList) Scaled(sx, sy, sz float64) PathList {
 	p1 := p.Clone()
 	p1.Scale(sx, sy, sz)
+	return p1
+}
+
+// UniScaled returns a copy of this pathlist, scaled.
+func (p PathList) UniScaled(scale float64) PathList {
+	p1 := p.Clone()
+	p1.UniScale(scale)
 	return p1
 }
 

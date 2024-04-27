@@ -97,6 +97,13 @@ func (p PointList) Scale(sx, sy, sz float64) {
 	}
 }
 
+// UniScale scales this pointlist in place.
+func (p PointList) UniScale(scale float64) {
+	for _, point := range p {
+		point.UniScale(scale)
+	}
+}
+
 // Randomize randomizes this pointlist in place.
 func (p PointList) Randomize(amount float64) {
 	for _, point := range p {
@@ -146,7 +153,14 @@ func (p PointList) Rotated(rx, ry, rz float64) PointList {
 // Scaled returns a copy of this pointlist, scaled.
 func (p PointList) Scaled(sx, sy, sz float64) PointList {
 	p1 := p.Clone()
-	p1.Rotate(sx, sy, sz)
+	p1.Scale(sx, sy, sz)
+	return p1
+}
+
+// UniScaled returns a copy of this pointlist, scaled.
+func (p PointList) UniScaled(scale float64) PointList {
+	p1 := p.Clone()
+	p1.UniScale(scale)
 	return p1
 }
 

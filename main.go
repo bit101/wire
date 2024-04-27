@@ -42,7 +42,7 @@ func init() {
 	torus = wire.Torus(200, 100, 60, 32)
 	torus.Randomize(5)
 
-	sphere = wire.Sphere(1000, 1000)
+	sphere = wire.Sphere(100, 100)
 	sphere.Scale(200, 200, 200)
 	sphere.Randomize(20)
 }
