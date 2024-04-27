@@ -48,13 +48,39 @@ func (p PointList) Project() (geom.PointList, []float64) {
 // Stroke strokes a path on a point list.
 func (p PointList) Stroke(context Context, closed bool) {
 	points, _ := p.Project()
-	for i := 0; i < len(points); i++ {
-		context.LineTo(points[i].X, points[i].Y)
+	for i := 0; i < len(points)-1; i++ {
+		if !Visible(p[i]) || !Visible(p[i+1]) {
+			continue
+		}
+		p0 := points[i]
+		p1 := points[i+1]
+		context.MoveTo(p0.X, p0.Y)
+		context.LineTo(p1.X, p1.Y)
+		context.Stroke()
 	}
 	if closed {
-		context.ClosePath()
+		if !Visible(p[0]) || !Visible(p.Last()) {
+			return
+		}
+		p0 := points[0]
+		p1 := points[len(points)-1]
+		context.MoveTo(p0.X, p0.Y)
+		context.LineTo(p1.X, p1.Y)
+		context.Stroke()
 	}
-	context.Stroke()
+}
+
+// Get returns the point at the given index. Negative indexes go in reverse from end.
+func (p PointList) Get(index int) *Point {
+	if index < 0 {
+		index = len(p) - index
+	}
+	return p[index]
+}
+
+// Last returns the last point in the list.
+func (p PointList) Last() *Point {
+	return p[len(p)-1]
 }
 
 //////////////////////////////

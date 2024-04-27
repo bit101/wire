@@ -10,6 +10,8 @@ import (
 	"github.com/bit101/wire"
 )
 
+//revive:disable:unused-parameter
+
 func main() {
 	bllog.InitProjectLog("project.log")
 	defer bllog.CloseLog()
@@ -26,62 +28,27 @@ func main() {
 }
 
 var (
-	box    wire.PathList
-	cyl    wire.PathList
-	torus  wire.PathList
 	sphere wire.PathList
 )
 
 func init() {
-	box = wire.Box(160, 200, 40)
-	cyl = wire.Cylinder(400, 100, 40, 100)
-	cyl.Randomize(3)
-	a := 0.0
-	for _, path := range cyl {
-		path.RotateY(a)
-		a += 0.02
-	}
-
-	torus = wire.Torus(200, 100, 60, 32)
-	torus.Randomize(5)
-
-	sphere = wire.Sphere(100, 24, 24)
-	// sphere.Randomize(20)
+	sphere = wire.Sphere(250, 24, 24)
+	sphere.Randomize(10)
 }
 
-//revive:disable-next-line:unused-parameter
 func scene1(context *cairo.Context, width, height, percent float64) {
-	context.BlackOnWhite()
+	context.WhiteOnBlack()
 	context.SetLineJoin(cairo.LineJoinRound)
 	wire.World.CX = width / 2
 	wire.World.CY = height / 2
-	wire.World.CZ = 400.0
+	wire.World.CZ = 500
 
-	b := box.Clone()
-	b.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
-
-	c := cyl.Clone()
-	c.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
-
-	t := torus.Clone()
-	t.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
-	// c.Randomize(blmath.LoopSin(percent, 0, 5))
-
-	s := sphere.Clone()
-	s.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
+	s := sphere.Rotated(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
 	context.SetLineWidth(1)
-	c.Stroke(context, true)
-	// t.Stroke(context, true)
-	// s.Stroke(context, true)
-	// b.Stroke(context, true)
+	s.Stroke(context, false)
 
-	context.GaussianBlur(10)
-	context.SetLineWidth(0.5)
-	c.Stroke(context, true)
-	// // t.Stroke(context, true)
+	// context.GaussianBlur(20)
+	// context.SetLineWidth(0.5)
 	// s.Stroke(context, true)
-	// b.Stroke(context, true)
-	//
-	// context.GridFull(20, 0.125)
 }

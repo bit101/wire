@@ -56,6 +56,7 @@ func Cylinder(height, radius float64, slices, res int) PathList {
 	return cyl
 }
 
+// Torus creates a 3d torus.
 func Torus(r1, r2 float64, slices, res int) PathList {
 	torus := NewPathList(slices)
 	fslice := float64(slices)
@@ -72,8 +73,9 @@ func Torus(r1, r2 float64, slices, res int) PathList {
 	return torus
 }
 
+// Sphere creates a 3d sphere.
 func Sphere(radius float64, slices, res int) PathList {
-	s := NewPathList(slices)
+	s := NewPathList(0)
 	fslice := float64(slices)
 	dt := blmath.Tau / float64(res)
 	for i := 0.0; i < fslice; i++ {
