@@ -52,6 +52,27 @@ func (p PathList) Stroke(context Context, closed bool) {
 // Transform in place.
 //////////////////////////////
 
+// TranslateX translates this pathlist on the x-axis in place.
+func (p PathList) TranslateX(tx float64) {
+	for _, path := range p {
+		path.TranslateX(tx)
+	}
+}
+
+// TranslateY translates this pathlist on the y-axis in place.
+func (p PathList) TranslateY(ty float64) {
+	for _, path := range p {
+		path.TranslateX(ty)
+	}
+}
+
+// TranslateZ translates this pathlist on the z-axis in place.
+func (p PathList) TranslateZ(tz float64) {
+	for _, path := range p {
+		path.TranslateX(tz)
+	}
+}
+
 // Translate translates this pathlist in place.
 func (p PathList) Translate(tx, ty, tz float64) {
 	for _, list := range p {
@@ -111,6 +132,27 @@ func (p PathList) Randomize(amount float64) {
 //////////////////////////////
 // Transform and return new
 //////////////////////////////
+
+// TranslatedX returns a copy of this pathlist, translated on the x-axis.
+func (p *PathList) TranslatedX(tx float64) PathList {
+	p1 := p.Clone()
+	p1.TranslateX(tx)
+	return p1
+}
+
+// TranslatedY returns a copy of this pathlist, translated on the y-axis.
+func (p *PathList) TranslatedY(ty float64) PathList {
+	p1 := p.Clone()
+	p1.TranslateY(ty)
+	return p1
+}
+
+// TranslatedZ returns a copy of this pathlist, translated on the z-axis.
+func (p *PathList) TranslatedZ(tz float64) PathList {
+	p1 := p.Clone()
+	p1.TranslateZ(tz)
+	return p1
+}
 
 // Translated returns a copy of this pathlist, translated.
 func (p PathList) Translated(tx, ty, tz float64) PathList {

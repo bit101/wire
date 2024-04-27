@@ -55,6 +55,27 @@ func (p PointList) Stroke(context Context, closed bool) {
 // Transform in place.
 //////////////////////////////
 
+// TranslateX translates this pointlist on the x-axis in place.
+func (p PointList) TranslateX(tx float64) {
+	for _, point := range p {
+		point.TranslateX(tx)
+	}
+}
+
+// TranslateY translates this pointlist on the y-axis in place.
+func (p PointList) TranslateY(ty float64) {
+	for _, point := range p {
+		point.TranslateX(ty)
+	}
+}
+
+// TranslateZ translates this pointlist on the z-axis in place.
+func (p PointList) TranslateZ(tz float64) {
+	for _, point := range p {
+		point.TranslateX(tz)
+	}
+}
+
 // Translate translates this pointlist in place.
 func (p PointList) Translate(tx, ty, tz float64) {
 	for _, point := range p {
@@ -114,6 +135,27 @@ func (p PointList) Randomize(amount float64) {
 //////////////////////////////
 // Transform and return new
 //////////////////////////////
+
+// TranslatedX returns a copy of this pointlist, translated on the x-axis.
+func (p *PointList) TranslatedX(tx float64) PointList {
+	p1 := p.Clone()
+	p1.TranslateX(tx)
+	return p1
+}
+
+// TranslatedY returns a copy of this pointlist, translated on the y-axis.
+func (p *PointList) TranslatedY(ty float64) PointList {
+	p1 := p.Clone()
+	p1.TranslateY(ty)
+	return p1
+}
+
+// TranslatedZ returns a copy of this pointlist, translated on the z-axis.
+func (p *PointList) TranslatedZ(tz float64) PointList {
+	p1 := p.Clone()
+	p1.TranslateZ(tz)
+	return p1
+}
 
 // Translated returns a copy of this pointlist, translated.
 func (p PointList) Translated(tx, ty, tz float64) PointList {

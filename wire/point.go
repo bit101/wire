@@ -33,6 +33,21 @@ func (p *Point) Project() (*geom.Point, float64) {
 // Transform in place.
 //////////////////////////////
 
+// TranslateX translates this point on the x-axis in place.
+func (p *Point) TranslateX(tx float64) {
+	p.X += tx
+}
+
+// TranslateY translates this point on the y-axis in place.
+func (p *Point) TranslateY(ty float64) {
+	p.Y += ty
+}
+
+// TranslateZ translates this point on the z-axis in place.
+func (p *Point) TranslateZ(tz float64) {
+	p.Z += tz
+}
+
 // Translate translates this point in place.
 func (p *Point) Translate(tx, ty, tz float64) {
 	p.X += tx
@@ -101,6 +116,27 @@ func (p *Point) Randomize(amount float64) {
 //////////////////////////////
 // Transform and return new
 //////////////////////////////
+
+// TranslatedX returns a copy of this point, translated on the x-axis.
+func (p *Point) TranslatedX(tx float64) *Point {
+	p1 := p.Clone()
+	p1.TranslateX(tx)
+	return p1
+}
+
+// TranslatedY returns a copy of this point, translated on the y-axis.
+func (p *Point) TranslatedY(ty float64) *Point {
+	p1 := p.Clone()
+	p1.TranslateY(ty)
+	return p1
+}
+
+// TranslatedZ returns a copy of this point, translated on the z-axis.
+func (p *Point) TranslatedZ(tz float64) *Point {
+	p1 := p.Clone()
+	p1.TranslateZ(tz)
+	return p1
+}
 
 // Translated returns a copy of this point, translated.
 func (p *Point) Translated(tx, ty, tz float64) *Point {
