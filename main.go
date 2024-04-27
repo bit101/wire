@@ -34,8 +34,13 @@ var (
 
 func init() {
 	box = wire.Box(160, 200, 40)
-	cyl = wire.Cylinder(300, 100, 100, 100)
-	cyl.Randomize(10)
+	cyl = wire.Cylinder(400, 100, 40, 100)
+	cyl.Randomize(3)
+	a := 0.0
+	for _, path := range cyl {
+		path.RotateY(a)
+		a += 0.02
+	}
 
 	torus = wire.Torus(200, 100, 60, 32)
 	torus.Randomize(5)
@@ -46,7 +51,7 @@ func init() {
 
 //revive:disable-next-line:unused-parameter
 func scene1(context *cairo.Context, width, height, percent float64) {
-	context.WhiteOnBlack()
+	context.BlackOnWhite()
 	context.SetLineJoin(cairo.LineJoinRound)
 	wire.World.CX = width / 2
 	wire.World.CY = height / 2
@@ -65,19 +70,18 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 	s := sphere.Clone()
 	s.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
-	context.SetLineWidth(2)
-	// c.Stroke(context, true)
+	context.SetLineWidth(1)
+	c.Stroke(context, true)
 	// t.Stroke(context, true)
-	s.Stroke(context, true)
-	b.Stroke(context, true)
+	// s.Stroke(context, true)
+	// b.Stroke(context, true)
 
-	context.GaussianBlur(20)
-	//
+	context.GaussianBlur(10)
 	context.SetLineWidth(0.5)
-	// c.Stroke(context, true)
-	// t.Stroke(context, true)
-	s.Stroke(context, true)
-	b.Stroke(context, true)
+	c.Stroke(context, true)
+	// // t.Stroke(context, true)
+	// s.Stroke(context, true)
+	// b.Stroke(context, true)
 	//
 	// context.GridFull(20, 0.125)
 }

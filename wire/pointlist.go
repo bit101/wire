@@ -48,7 +48,13 @@ func (p PointList) Project() (geom.PointList, []float64) {
 // Stroke strokes a path on a point list.
 func (p PointList) Stroke(context Context, closed bool) {
 	points, _ := p.Project()
-	context.StrokePath(points, closed)
+	for i := 0; i < len(points); i++ {
+		context.LineTo(points[i].X, points[i].Y)
+	}
+	if closed {
+		context.ClosePath()
+	}
+	context.Stroke()
 }
 
 //////////////////////////////

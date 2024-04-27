@@ -14,6 +14,7 @@ type Context interface {
 	MoveTo(float64, float64)
 	LineTo(float64, float64)
 	Stroke()
+	ClosePath()
 }
 
 func Box(w, h, d float64) PathList {
@@ -47,7 +48,7 @@ func Cylinder(height, radius float64, slices, res int) PathList {
 	cyl := NewPathList(slices)
 	dt := blmath.Tau / float64(res)
 	for i := 0; i < slices; i++ {
-		for t := 0.0; t < blmath.Tau-dt; t += dt {
+		for t := 0.0; t <= blmath.Tau-dt; t += dt {
 			y := float64(i)/float64(slices)*height - height/2
 			cyl.AddXYZ(i, math.Cos(t)*radius, y, math.Sin(t)*radius)
 		}
@@ -62,7 +63,7 @@ func Torus(r1, r2 float64, slices, res int) PathList {
 	for i := 0.0; i < fslice; i++ {
 		angle := i / fslice * blmath.Tau
 		path := NewPointList()
-		for t := 0.0; t < blmath.Tau; t += dt {
+		for t := 0.0; t <= blmath.Tau-dt; t += dt {
 			path.AddXYZ(r1+math.Cos(t)*r2, math.Sin(t)*r2, 0)
 		}
 		path.RotateY(angle)
@@ -78,7 +79,7 @@ func Sphere(radius float64, slices, res int) PathList {
 	for i := 0.0; i < fslice; i++ {
 		path := NewPointList()
 		a := i / fslice * math.Pi
-		for t := 0.0; t < blmath.Tau-dt; t += dt {
+		for t := 0.0; t <= blmath.Tau-dt; t += dt {
 			y := math.Cos(a)
 			r := math.Sin(a)
 			path.AddXYZ(math.Cos(t)*r, y, math.Sin(t)*r)
@@ -87,5 +88,4 @@ func Sphere(radius float64, slices, res int) PathList {
 	}
 	s.UniScale(radius)
 	return s
-
 }
