@@ -7,7 +7,7 @@ import (
 	cairo "github.com/bit101/blcairo"
 	"github.com/bit101/blcairo/render"
 	"github.com/bit101/blcairo/target"
-	"github.com/bit101/wire/wire"
+	"github.com/bit101/wire"
 )
 
 func main() {
