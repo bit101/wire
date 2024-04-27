@@ -32,8 +32,7 @@ var (
 )
 
 func init() {
-	sphere = wire.Sphere(250, 24, 24)
-	sphere.Randomize(10)
+	sphere = wire.Sphere(250, 24, 3)
 }
 
 func scene1(context *cairo.Context, width, height, percent float64) {
@@ -41,12 +40,12 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 	context.SetLineJoin(cairo.LineJoinRound)
 	wire.World.CX = width / 2
 	wire.World.CY = height / 2
-	wire.World.CZ = 500
+	wire.World.CZ = 500 //blmath.LoopSin(percent, 100, 500)
 
 	s := sphere.Rotated(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
 	context.SetLineWidth(1)
-	s.Stroke(context, false)
+	s.Stroke(context, true)
 
 	// context.GaussianBlur(20)
 	// context.SetLineWidth(0.5)

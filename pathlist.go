@@ -143,6 +143,27 @@ func (p PathList) UniScale(scale float64) {
 	}
 }
 
+// RandomizeX randomizes this pathlist on the x-axis, in place.
+func (p PathList) RandomizeX(amount float64) {
+	for _, list := range p {
+		list.RandomizeX(amount)
+	}
+}
+
+// RandomizeY randomizes this pathlist on the y-axis, in place.
+func (p PathList) RandomizeY(amount float64) {
+	for _, list := range p {
+		list.RandomizeY(amount)
+	}
+}
+
+// RandomizeZ randmizes this pathlist on the z-axis, in place.
+func (p PathList) RandomizeZ(amount float64) {
+	for _, list := range p {
+		list.RandomizeZ(amount)
+	}
+}
+
 // Randomize randomizes this pathlist in place.
 func (p PathList) Randomize(amount float64) {
 	for _, list := range p {
@@ -242,6 +263,27 @@ func (p PathList) Scaled(sx, sy, sz float64) PathList {
 func (p PathList) UniScaled(scale float64) PathList {
 	p1 := p.Clone()
 	p1.UniScale(scale)
+	return p1
+}
+
+// RandomizedX returns a copy of this pathlist, randomized on the x-axis.
+func (p PathList) RandomizedX(amount float64) PathList {
+	p1 := p.Clone()
+	p1.RandomizeX(amount)
+	return p1
+}
+
+// RandomizedY returns a copy of this pathlist, randomized on the y-axis.
+func (p PathList) RandomizedY(amount float64) PathList {
+	p1 := p.Clone()
+	p1.RandomizeY(amount)
+	return p1
+}
+
+// RandomizedZ returns a copy of this pathlist, randomized on the z-axis.
+func (p PathList) RandomizedZ(amount float64) PathList {
+	p1 := p.Clone()
+	p1.RandomizeZ(amount)
 	return p1
 }
 

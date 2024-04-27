@@ -121,6 +121,21 @@ func (p *Point) UniScale(scale float64) {
 	p.Z *= scale
 }
 
+// RandomizeX randomizes this point on the x-axis in place.
+func (p *Point) RandomizeX(amount float64) {
+	p.X += random.FloatRange(-amount, amount)
+}
+
+// RandomizeY randomizes this point on the y-axis in place.
+func (p *Point) RandomizeY(amount float64) {
+	p.Y += random.FloatRange(-amount, amount)
+}
+
+// RandomizeZ randomizes this point on the z-axis in place.
+func (p *Point) RandomizeZ(amount float64) {
+	p.Z += random.FloatRange(-amount, amount)
+}
+
 // Randomize randomizes this point in place.
 func (p *Point) Randomize(amount float64) {
 	p.X += random.FloatRange(-amount, amount)
@@ -220,6 +235,27 @@ func (p *Point) Scaled(sx, sy, sz float64) *Point {
 func (p *Point) UniScaled(scale float64) *Point {
 	p1 := p.Clone()
 	p1.UniScale(scale)
+	return p1
+}
+
+// RandomizedX returns a copy of this point, randomized on the x-axis.
+func (p *Point) RandomizedX(amount float64) *Point {
+	p1 := p.Clone()
+	p1.RandomizeX(amount)
+	return p1
+}
+
+// RandomizedY returns a copy of this point, randomized on the y-axis.
+func (p *Point) RandomizedY(amount float64) *Point {
+	p1 := p.Clone()
+	p1.RandomizeY(amount)
+	return p1
+}
+
+// RandomizedZ returns a copy of this point, randomized on the z-axis.
+func (p *Point) RandomizedZ(amount float64) *Point {
+	p1 := p.Clone()
+	p1.RandomizeZ(amount)
 	return p1
 }
 

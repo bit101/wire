@@ -45,23 +45,23 @@ func (p PointList) Project() (geom.PointList, []float64) {
 	return list, scales
 }
 
+func shouldDraw(p0, p1 *Point) bool {
+	return Visible(p0) && Visible(p1)
+}
+
 // Stroke strokes a path on a point list.
 func (p PointList) Stroke(context Context, closed bool) {
 	points, _ := p.Project()
 	for i := 0; i < len(points)-1; i++ {
-		if !Visible(p[i]) || !Visible(p[i+1]) {
-			continue
+		if shouldDraw(p[i], p[i+1]) {
+			p0 := points[i]
+			p1 := points[i+1]
+			context.MoveTo(p0.X, p0.Y)
+			context.LineTo(p1.X, p1.Y)
+			context.Stroke()
 		}
-		p0 := points[i]
-		p1 := points[i+1]
-		context.MoveTo(p0.X, p0.Y)
-		context.LineTo(p1.X, p1.Y)
-		context.Stroke()
 	}
-	if closed {
-		if !Visible(p[0]) || !Visible(p.Last()) {
-			return
-		}
+	if closed && shouldDraw(p[0], p.Last()) {
 		p0 := points[0]
 		p1 := points[len(points)-1]
 		context.MoveTo(p0.X, p0.Y)
@@ -178,6 +178,27 @@ func (p PointList) UniScale(scale float64) {
 	}
 }
 
+// RandomizeX randomizes this pointlist on the x-axis, in place.
+func (p PointList) RandomizeX(amount float64) {
+	for _, point := range p {
+		point.RandomizeX(amount)
+	}
+}
+
+// RandomizeY randomizes this pointlist on the y-axis, in place.
+func (p PointList) RandomizeY(amount float64) {
+	for _, point := range p {
+		point.RandomizeY(amount)
+	}
+}
+
+// RandomizeZ randomizes this pointlist on the z-axis, in place.
+func (p PointList) RandomizeZ(amount float64) {
+	for _, point := range p {
+		point.RandomizeZ(amount)
+	}
+}
+
 // Randomize randomizes this pointlist in place.
 func (p PointList) Randomize(amount float64) {
 	for _, point := range p {
@@ -277,6 +298,27 @@ func (p PointList) Scaled(sx, sy, sz float64) PointList {
 func (p PointList) UniScaled(scale float64) PointList {
 	p1 := p.Clone()
 	p1.UniScale(scale)
+	return p1
+}
+
+// RandomizedX returns a copy of this pointlist, randomized on the x-axis
+func (p PointList) RandomizedX(amount float64) PointList {
+	p1 := p.Clone()
+	p1.RandomizeX(amount)
+	return p1
+}
+
+// RandomizedY returns a copy of this pointlist, randomized on the y-axis
+func (p PointList) RandomizedY(amount float64) PointList {
+	p1 := p.Clone()
+	p1.RandomizeY(amount)
+	return p1
+}
+
+// RandomizedZ returns a copy of this pointlist, randomized on the z-axis
+func (p PointList) RandomizedZ(amount float64) PointList {
+	p1 := p.Clone()
+	p1.RandomizeZ(amount)
 	return p1
 }
 
