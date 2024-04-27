@@ -33,27 +33,24 @@ var (
 )
 
 func init() {
-	box = wire.Box()
-	box.UniScale(160)
-	cyl = wire.Cylinder(20, 24)
-	cyl.Scale(50, 200, 50)
-	cyl.Randomize(5)
+	box = wire.Box(160, 200, 40)
+	cyl = wire.Cylinder(300, 100, 100, 100)
+	cyl.Randomize(10)
 
 	torus = wire.Torus(200, 100, 60, 32)
 	torus.Randomize(5)
 
-	sphere = wire.Sphere(100, 100)
-	sphere.UniScale(200)
-	sphere.Randomize(20)
+	sphere = wire.Sphere(100, 24, 24)
+	// sphere.Randomize(20)
 }
 
 //revive:disable-next-line:unused-parameter
 func scene1(context *cairo.Context, width, height, percent float64) {
-	context.BlackOnWhite()
+	context.WhiteOnBlack()
 	context.SetLineJoin(cairo.LineJoinRound)
 	wire.World.CX = width / 2
 	wire.World.CY = height / 2
-	wire.World.CZ = 500.0
+	wire.World.CZ = 400.0
 
 	b := box.Clone()
 	b.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
@@ -68,19 +65,19 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 	s := sphere.Clone()
 	s.Rotate(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
-	context.SetLineWidth(0.5)
+	context.SetLineWidth(2)
 	// c.Stroke(context, true)
 	// t.Stroke(context, true)
 	s.Stroke(context, true)
 	b.Stroke(context, true)
 
-	// context.GaussianBlur(10)
+	context.GaussianBlur(20)
 	//
-	// context.SetLineWidth(0.5)
-	// // c.Stroke(context, true)
-	// // t.Stroke(context, true)
-	// s.Stroke(context, true)
-	// b.Stroke(context, true)
+	context.SetLineWidth(0.5)
+	// c.Stroke(context, true)
+	// t.Stroke(context, true)
+	s.Stroke(context, true)
+	b.Stroke(context, true)
 	//
-	context.GridFull(20, 0.125)
+	// context.GridFull(20, 0.125)
 }

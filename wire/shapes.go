@@ -16,7 +16,7 @@ type Context interface {
 	Stroke()
 }
 
-func Box() PathList {
+func Box(w, h, d float64) PathList {
 	box := NewPathList(6)
 
 	box.AddXYZ(0, -1, -1, -1)
@@ -38,16 +38,18 @@ func Box() PathList {
 	box.AddXYZ(3, -1, -1, -1)
 	box.AddXYZ(3, 1, -1, -1)
 	box.AddXYZ(3, 1, -1, 1)
+	box.Scale(w, h, d)
 	return box
 }
 
-func Cylinder(slices, res int) PathList {
+// Cylinder creates a cylindar shape.
+func Cylinder(height, radius float64, slices, res int) PathList {
 	cyl := NewPathList(slices)
 	dt := blmath.Tau / float64(res)
 	for i := 0; i < slices; i++ {
-		for t := 0.0; t < blmath.Tau; t += dt {
-			y := float64(i)/float64(slices)*2.0 - 1.0
-			cyl.AddXYZ(i, math.Cos(t), y, math.Sin(t))
+		for t := 0.0; t < blmath.Tau-dt; t += dt {
+			y := float64(i)/float64(slices)*height - height/2
+			cyl.AddXYZ(i, math.Cos(t)*radius, y, math.Sin(t)*radius)
 		}
 	}
 	return cyl
@@ -69,7 +71,7 @@ func Torus(r1, r2 float64, slices, res int) PathList {
 	return torus
 }
 
-func Sphere(slices, res int) PathList {
+func Sphere(radius float64, slices, res int) PathList {
 	s := NewPathList(slices)
 	fslice := float64(slices)
 	dt := blmath.Tau / float64(res)
@@ -83,6 +85,7 @@ func Sphere(slices, res int) PathList {
 		}
 		s.Add(path)
 	}
+	s.UniScale(radius)
 	return s
 
 }
