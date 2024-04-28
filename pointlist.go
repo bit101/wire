@@ -97,7 +97,7 @@ func (p PointList) TranslateX(tx float64) {
 // TranslateY translates this pointlist on the y-axis in place.
 func (p PointList) TranslateY(ty float64) {
 	for _, point := range p {
-		point.TranslateX(ty)
+		point.TranslateY(ty)
 	}
 }
 
