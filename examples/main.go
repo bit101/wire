@@ -2,7 +2,6 @@
 package main
 
 import (
-	"github.com/bit101/bitlib/bllog"
 	"github.com/bit101/bitlib/blmath"
 	cairo "github.com/bit101/blcairo"
 	"github.com/bit101/blcairo/render"
@@ -13,9 +12,6 @@ import (
 //revive:disable:unused-parameter
 
 func main() {
-	bllog.InitProjectLog("project.log")
-	defer bllog.CloseLog()
-
 	renderTarget := target.Video
 
 	if renderTarget == target.Image {
@@ -32,7 +28,8 @@ var (
 )
 
 func init() {
-	sphere = wire.Sphere(250, 24, 3)
+	sphere = wire.Sphere(250, 100, 100)
+	sphere.Randomize(10)
 }
 
 func scene1(context *cairo.Context, width, height, percent float64) {
@@ -40,14 +37,14 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 	context.SetLineJoin(cairo.LineJoinRound)
 	wire.World.CX = width / 2
 	wire.World.CY = height / 2
-	wire.World.CZ = 500 //blmath.LoopSin(percent, 100, 500)
+	wire.World.CZ = blmath.LoopSin(percent, -100, 1000)
 
 	s := sphere.Rotated(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
 	context.SetLineWidth(1)
 	s.Stroke(context, true)
 
-	// context.GaussianBlur(20)
-	// context.SetLineWidth(0.5)
-	// s.Stroke(context, true)
+	context.GaussianBlur(20)
+	context.SetLineWidth(0.5)
+	s.Stroke(context, true)
 }
