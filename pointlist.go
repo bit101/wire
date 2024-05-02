@@ -51,11 +51,17 @@ func shouldDraw(p0, p1 *Point) bool {
 
 // Stroke strokes a path on a point list.
 func (p PointList) Stroke(context Context, closed bool) {
-	points, _ := p.Project()
+	points, scales := p.Project()
+	lineWidth := context.GetLineWidth()
 	for i := 0; i < len(points)-1; i++ {
+		scale := 1.0
+		if World.ScaleLineWidth {
+			scale = scales[i]
+		}
 		if shouldDraw(p[i], p[i+1]) {
 			p0 := points[i]
 			p1 := points[i+1]
+			context.SetLineWidth(lineWidth * scale)
 			context.MoveTo(p0.X, p0.Y)
 			context.LineTo(p1.X, p1.Y)
 			context.Stroke()
@@ -64,10 +70,12 @@ func (p PointList) Stroke(context Context, closed bool) {
 	if closed && shouldDraw(p[0], p.Last()) {
 		p0 := points[0]
 		p1 := points[len(points)-1]
+		context.SetLineWidth(lineWidth * scales[0])
 		context.MoveTo(p0.X, p0.Y)
 		context.LineTo(p1.X, p1.Y)
 		context.Stroke()
 	}
+	context.SetLineWidth(lineWidth)
 }
 
 // Get returns the point at the given index. Negative indexes go in reverse from end.
@@ -104,7 +112,7 @@ func (p PointList) TranslateY(ty float64) {
 // TranslateZ translates this pointlist on the z-axis in place.
 func (p PointList) TranslateZ(tz float64) {
 	for _, point := range p {
-		point.TranslateX(tz)
+		point.TranslateZ(tz)
 	}
 }
 

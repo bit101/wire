@@ -69,7 +69,7 @@ func (p PathList) TranslateY(ty float64) {
 // TranslateZ translates this pathlist on the z-axis in place.
 func (p PathList) TranslateZ(tz float64) {
 	for _, path := range p {
-		path.TranslateX(tz)
+		path.TranslateZ(tz)
 	}
 }
 

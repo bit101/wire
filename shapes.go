@@ -15,6 +15,8 @@ type Context interface {
 	LineTo(float64, float64)
 	Stroke()
 	ClosePath()
+	SetLineWidth(float64)
+	GetLineWidth() float64
 }
 
 func Box(w, h, d float64) PathList {
