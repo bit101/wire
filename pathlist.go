@@ -1,7 +1,9 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
-import "log"
+import (
+	"log"
+)
 
 // PathList is a list of lists of 3d points.
 type PathList []PointList
@@ -48,6 +50,15 @@ func (p PathList) Stroke(context Context, closed bool) {
 	}
 }
 
+func (p *PathList) Subdivide(times int) {
+	newList := NewPathList(0)
+	for _, path := range *p {
+		path.Subdivide(times)
+		newList.Add(path)
+	}
+	*p = newList
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////
@@ -62,7 +73,7 @@ func (p PathList) TranslateX(tx float64) {
 // TranslateY translates this pathlist on the y-axis in place.
 func (p PathList) TranslateY(ty float64) {
 	for _, path := range p {
-		path.TranslateX(ty)
+		path.TranslateY(ty)
 	}
 }
 

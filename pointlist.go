@@ -91,6 +91,20 @@ func (p PointList) Last() *Point {
 	return p[len(p)-1]
 }
 
+func (p *PointList) Subdivide(times int) {
+	for t := 0; t < times; t++ {
+		newList := NewPointList()
+		for i := 0; i < len(*p)-1; i++ {
+			p0 := (*p)[i]
+			p1 := (*p)[i+1]
+			newList.Add(p0.Clone())
+			newList.AddXYZ((p0.X+p1.X)/2, (p0.Y+p1.Y)/2, (p0.Z+p1.Z)/2)
+		}
+		newList.Add(p.Last().Clone())
+		*p = newList
+	}
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////

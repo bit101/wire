@@ -45,17 +45,23 @@ func Box(w, h, d float64) PathList {
 	return box
 }
 
-// Cylinder creates a cylindar shape.
-func Cylinder(height, radius float64, slices, res int) PathList {
+// Cone creates a cone shape.
+func Cone(height, radius0, radius1 float64, slices, res int) PathList {
 	cyl := NewPathList(slices)
 	dt := blmath.Tau / float64(res)
 	for i := 0; i < slices; i++ {
+		radius := float64(i)/float64(slices)*(radius1-radius0) + radius0
 		for t := 0.0; t <= blmath.Tau-dt; t += dt {
-			y := float64(i)/float64(slices)*height - height/2
+			y := float64(i)/(float64(slices)-1)*height - height/2
 			cyl.AddXYZ(i, math.Cos(t)*radius, y, math.Sin(t)*radius)
 		}
 	}
 	return cyl
+}
+
+// Cylinder creates a cylindar shape.
+func Cylinder(height, radius float64, slices, res int) PathList {
+	return Cone(height, radius, radius, slices, res)
 }
 
 // Torus creates a 3d torus.
