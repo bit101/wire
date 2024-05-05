@@ -50,13 +50,10 @@ func (p PathList) Stroke(context Context, closed bool) {
 	}
 }
 
-func (p *PathList) Subdivide(times int) {
-	newList := NewPathList(0)
-	for _, path := range *p {
-		path.Subdivide(times)
-		newList.Add(path)
+func (p PathList) Subdivide(times int) {
+	for i := 0; i < len(p); i++ {
+		p[i].Subdivide(times)
 	}
-	*p = newList
 }
 
 //////////////////////////////
