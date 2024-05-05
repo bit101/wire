@@ -13,7 +13,7 @@ type Point struct {
 	X, Y, Z float64
 }
 
-// NewPoint creates a new point.
+// NewPoint creates a new 3d point.
 func NewPoint(x, y, z float64) *Point {
 	return &Point{x, y, z}
 }
@@ -33,29 +33,29 @@ func (p *Point) Project() (*geom.Point, float64) {
 // Transform in place.
 //////////////////////////////
 
-// TranslateX translates this point on the x-axis in place.
+// TranslateX translates this point on the x-axis, in place.
 func (p *Point) TranslateX(tx float64) {
 	p.X += tx
 }
 
-// TranslateY translates this point on the y-axis in place.
+// TranslateY translates this point on the y-axis, in place.
 func (p *Point) TranslateY(ty float64) {
 	p.Y += ty
 }
 
-// TranslateZ translates this point on the z-axis in place.
+// TranslateZ translates this point on the z-axis, in place.
 func (p *Point) TranslateZ(tz float64) {
 	p.Z += tz
 }
 
-// Translate translates this point in place.
+// Translate translates this point on all three axes, in place.
 func (p *Point) Translate(tx, ty, tz float64) {
 	p.X += tx
 	p.Y += ty
 	p.Z += tz
 }
 
-// RotateX rotates this point around the x-axis in place.
+// RotateX rotates this point around the x-axis, in place.
 func (p *Point) RotateX(angle float64) {
 	c := math.Cos(angle)
 	s := math.Sin(angle)
@@ -65,7 +65,7 @@ func (p *Point) RotateX(angle float64) {
 	p.Z = z
 }
 
-// RotateY rotates this point around the y-axis in place.
+// RotateY rotates this point around the y-axis, in place.
 func (p *Point) RotateY(angle float64) {
 	c := math.Cos(angle)
 	s := math.Sin(angle)
@@ -75,7 +75,7 @@ func (p *Point) RotateY(angle float64) {
 	p.Z = z
 }
 
-// RotateZ rotates this point around the z-axis in place.
+// RotateZ rotates this point around the z-axis, in place.
 func (p *Point) RotateZ(angle float64) {
 	c := math.Cos(angle)
 	s := math.Sin(angle)
@@ -85,7 +85,7 @@ func (p *Point) RotateZ(angle float64) {
 	p.X = x
 }
 
-// Rotate rotates this point in place.
+// Rotate rotates this point around all axes, in place.
 func (p *Point) Rotate(rx, ry, rz float64) {
 	p.RotateX(rx)
 	p.RotateY(ry)
@@ -107,36 +107,36 @@ func (p *Point) ScaleZ(scale float64) {
 	p.Z *= scale
 }
 
-// Scale scales this point in place.
+// Scale scales this point on all axes, in place.
 func (p *Point) Scale(sx, sy, sz float64) {
 	p.X *= sx
 	p.Y *= sy
 	p.Z *= sz
 }
 
-// UniScale scales this point in place.
+// UniScale scales this point by the same amount on each axis, in place.
 func (p *Point) UniScale(scale float64) {
 	p.X *= scale
 	p.Y *= scale
 	p.Z *= scale
 }
 
-// RandomizeX randomizes this point on the x-axis in place.
+// RandomizeX randomizes this point on the x-axis, in place.
 func (p *Point) RandomizeX(amount float64) {
 	p.X += random.FloatRange(-amount, amount)
 }
 
-// RandomizeY randomizes this point on the y-axis in place.
+// RandomizeY randomizes this point on the y-axis, in place.
 func (p *Point) RandomizeY(amount float64) {
 	p.Y += random.FloatRange(-amount, amount)
 }
 
-// RandomizeZ randomizes this point on the z-axis in place.
+// RandomizeZ randomizes this point on the z-axis, in place.
 func (p *Point) RandomizeZ(amount float64) {
 	p.Z += random.FloatRange(-amount, amount)
 }
 
-// Randomize randomizes this point in place.
+// Randomize randomizes this point on all axes, in place.
 func (p *Point) Randomize(amount float64) {
 	p.X += random.FloatRange(-amount, amount)
 	p.Y += random.FloatRange(-amount, amount)
@@ -168,7 +168,7 @@ func (p *Point) TranslatedZ(tz float64) *Point {
 	return p1
 }
 
-// Translated returns a copy of this point, translated.
+// Translated returns a copy of this point, translated on all axes.
 func (p *Point) Translated(tx, ty, tz float64) *Point {
 	p1 := p.Clone()
 	p1.Translate(tx, ty, tz)
@@ -196,42 +196,42 @@ func (p *Point) RotatedZ(angle float64) *Point {
 	return p1
 }
 
-// Rotated returns a copy of this point, rotated.
+// Rotated returns a copy of this point, rotated around all axes.
 func (p *Point) Rotated(rx, ry, rz float64) *Point {
 	p1 := p.Clone()
 	p1.Rotate(rx, ry, rz)
 	return p1
 }
 
-// ScaledX scales this point on the x-axis, in place.
+// ScaledX returns a copy of this point, scaled on the x-axis.
 func (p *Point) ScaledX(scale float64) *Point {
 	p1 := p.Clone()
 	p1.ScaleX(scale)
 	return p1
 }
 
-// ScaledY scales this point on the y-axis, in place.
+// ScaledY returns a copy of this point, scaled on the y-axis.
 func (p *Point) ScaledY(scale float64) *Point {
 	p1 := p.Clone()
 	p1.ScaleY(scale)
 	return p1
 }
 
-// ScaledZ scales this point on the z-axis, in place.
+// ScaledZ returns a copy of this point, scaled on the z-axis.
 func (p *Point) ScaledZ(scale float64) *Point {
 	p1 := p.Clone()
 	p1.ScaleY(scale)
 	return p1
 }
 
-// Scaled returns a copy of this point, scaled.
+// Scaled returns a copy of this point, scaled on all axes.
 func (p *Point) Scaled(sx, sy, sz float64) *Point {
 	p1 := p.Clone()
 	p1.Scale(sx, sy, sz)
 	return p1
 }
 
-// UniScaled returns a copy of this point, scaled.
+// UniScaled returns a copy of this point, scaled by the same amount on each axis.
 func (p *Point) UniScaled(scale float64) *Point {
 	p1 := p.Clone()
 	p1.UniScale(scale)
@@ -259,7 +259,7 @@ func (p *Point) RandomizedZ(amount float64) *Point {
 	return p1
 }
 
-// Randomized returns a copy of this point, randomized.
+// Randomized returns a copy of this point, randomized on all axes.
 func (p *Point) Randomized(amount float64) *Point {
 	p1 := p.Clone()
 	p1.Randomize(amount)

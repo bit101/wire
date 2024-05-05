@@ -8,6 +8,8 @@ import (
 )
 
 // Context interface to allow for drawing functions.
+// The interface defines only the used methods of cairo.Context.
+// This is needed to avoid recursive dependencies between wire and cairo.
 type Context interface {
 	StrokePath(geom.PointList, bool)
 	MoveTo(float64, float64)
@@ -18,7 +20,7 @@ type Context interface {
 	GetLineWidth() float64
 }
 
-// Shape is a 3d shape.
+// Shape is a 3d shape composed of multiple 3d paths.
 type Shape struct {
 	Paths  []PointList
 	Closed bool
@@ -37,7 +39,7 @@ func (s *Shape) Add(path PointList) {
 	s.Paths = append(s.Paths, path)
 }
 
-// AddPoint adds a point to the shape at the given index.
+// AddPoint adds a point to the shape at the given path index.
 func (s *Shape) AddPoint(index int, point *Point) {
 	if index >= len(s.Paths) || index < 0 {
 		log.Fatal("list index must be from 0 to one less than the size of the list")
@@ -45,7 +47,7 @@ func (s *Shape) AddPoint(index int, point *Point) {
 	s.Paths[index].Add(point)
 }
 
-// AddXYZ adds a point to the shape at the given index.
+// AddXYZ adds a point to the shape at the given path index.
 func (s *Shape) AddXYZ(index int, x, y, z float64) {
 	if index >= len(s.Paths) || index < 0 {
 		log.Fatal("list index must be from 0 to one less than the size of the list")
@@ -55,10 +57,7 @@ func (s *Shape) AddXYZ(index int, x, y, z float64) {
 
 // Clone returns a deep copy of this shape.
 func (s *Shape) Clone() *Shape {
-	clone := &Shape{
-		[]PointList{},
-		s.Closed,
-	}
+	clone := NewShape(0, s.Closed)
 	for _, pointList := range s.Paths {
 		clone.Paths = append(clone.Paths, pointList.Clone())
 	}
@@ -83,56 +82,56 @@ func (s *Shape) Subdivide(times int) {
 // Transform in place.
 //////////////////////////////
 
-// TranslateX translates this shape on the x-axis in place.
+// TranslateX translates this shape on the x-axis, in place.
 func (s *Shape) TranslateX(tx float64) {
 	for _, path := range s.Paths {
 		path.TranslateX(tx)
 	}
 }
 
-// TranslateY translates this shape on the y-axis in place.
+// TranslateY translates this shape on the y-axis, in place.
 func (s *Shape) TranslateY(ty float64) {
 	for _, path := range s.Paths {
 		path.TranslateY(ty)
 	}
 }
 
-// TranslateZ translates this shape on the z-axis in place.
+// TranslateZ translates this shape on the z-axis, in place.
 func (s *Shape) TranslateZ(tz float64) {
 	for _, path := range s.Paths {
 		path.TranslateZ(tz)
 	}
 }
 
-// Translate translates this shape in place.
+// Translate translates this shape on all axes, in place.
 func (s *Shape) Translate(tx, ty, tz float64) {
 	for _, list := range s.Paths {
 		list.Translate(tx, ty, tz)
 	}
 }
 
-// RotateX rotates this shape around the x-axis in place.
+// RotateX rotates this shape around the x-axis, in place.
 func (s *Shape) RotateX(angle float64) {
 	for _, list := range s.Paths {
 		list.RotateX(angle)
 	}
 }
 
-// RotateY rotates this shape around the y-axis in place.
+// RotateY rotates this shape around the y-axis, in place.
 func (s *Shape) RotateY(angle float64) {
 	for _, list := range s.Paths {
 		list.RotateY(angle)
 	}
 }
 
-// RotateZ rotates this shape around the z-axis in place.
+// RotateZ rotates this shape around the z-axis, in place.
 func (s *Shape) RotateZ(angle float64) {
 	for _, list := range s.Paths {
 		list.RotateZ(angle)
 	}
 }
 
-// Rotate rotates this shape in place.
+// Rotate rotates this shape around all axes, in place.
 func (s *Shape) Rotate(rx, ry, rz float64) {
 	for _, list := range s.Paths {
 		list.Rotate(rx, ry, rz)
@@ -160,14 +159,14 @@ func (s *Shape) ScaleZ(scale float64) {
 	}
 }
 
-// Scale scales this shape in place.
+// Scale scales this shape on all axes, in place.
 func (s *Shape) Scale(sx, sy, sz float64) {
 	for _, list := range s.Paths {
 		list.Scale(sx, sy, sz)
 	}
 }
 
-// UniScale scales this shape in place.
+// UniScale scales this shape by the same amount on each axis, in place.
 func (s *Shape) UniScale(scale float64) {
 	for _, list := range s.Paths {
 		list.UniScale(scale)
@@ -195,7 +194,7 @@ func (s *Shape) RandomizeZ(amount float64) {
 	}
 }
 
-// Randomize randomizes this shape in place.
+// Randomize randomizes this shape on all axes, in place.
 func (s *Shape) Randomize(amount float64) {
 	for _, list := range s.Paths {
 		list.Randomize(amount)
@@ -227,7 +226,7 @@ func (s *Shape) TranslatedZ(tz float64) *Shape {
 	return s1
 }
 
-// Translated returns a copy of this shape, translated.
+// Translated returns a copy of this shape, translated on all axes.
 func (s *Shape) Translated(tx, ty, tz float64) *Shape {
 	s1 := s.Clone()
 	s1.Translate(tx, ty, tz)
@@ -255,7 +254,7 @@ func (s *Shape) RotatedZ(angle float64) *Shape {
 	return s1
 }
 
-// Rotated returns a copy of this shape, rotated.
+// Rotated returns a copy of this shape, rotated on all axes.
 func (s *Shape) Rotated(rx, ry, rz float64) *Shape {
 	s1 := s.Clone()
 	s1.Rotate(rx, ry, rz)
@@ -283,14 +282,14 @@ func (s *Shape) ScaledZ(scale float64) *Shape {
 	return s1
 }
 
-// Scaled returns a copy of this shape, scaled.
+// Scaled returns a copy of this shape, scaled on all axes.
 func (s *Shape) Scaled(sx, sy, sz float64) *Shape {
 	s1 := s.Clone()
 	s1.Scale(sx, sy, sz)
 	return s1
 }
 
-// UniScaled returns a copy of this shape, scaled.
+// UniScaled returns a copy of this shape, scaled by the same amount on each axis.
 func (s *Shape) UniScaled(scale float64) *Shape {
 	s1 := s.Clone()
 	s1.UniScale(scale)
@@ -318,7 +317,7 @@ func (s *Shape) RandomizedZ(amount float64) *Shape {
 	return s1
 }
 
-// Randomized returns a copy of this shape, randomized.
+// Randomized returns a copy of this shape, randomized on all axes.
 func (s *Shape) Randomized(amount float64) *Shape {
 	s1 := s.Clone()
 	s1.Randomize(amount)

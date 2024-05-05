@@ -7,39 +7,39 @@ import (
 	"github.com/bit101/bitlib/blmath"
 )
 
-// Box creates a 3d box.
+// Box creates a 3d box shape.
 func Box(w, h, d float64) *Shape {
-	box := &Shape{
+	shape := &Shape{
 		make([]PointList, 4),
 		false,
 	}
 
-	box.AddXYZ(0, -1, -1, -1)
-	box.AddXYZ(0, -1, 1, -1)
-	box.AddXYZ(0, 1, 1, -1)
-	box.AddXYZ(0, 1, -1, -1)
+	shape.AddXYZ(0, -1, -1, -1)
+	shape.AddXYZ(0, -1, 1, -1)
+	shape.AddXYZ(0, 1, 1, -1)
+	shape.AddXYZ(0, 1, -1, -1)
 
-	box.AddXYZ(1, -1, 1, -1)
-	box.AddXYZ(1, -1, 1, 1)
-	box.AddXYZ(1, 1, 1, 1)
-	box.AddXYZ(1, 1, 1, -1)
+	shape.AddXYZ(1, -1, 1, -1)
+	shape.AddXYZ(1, -1, 1, 1)
+	shape.AddXYZ(1, 1, 1, 1)
+	shape.AddXYZ(1, 1, 1, -1)
 
-	box.AddXYZ(2, -1, 1, 1)
-	box.AddXYZ(2, -1, -1, 1)
-	box.AddXYZ(2, 1, -1, 1)
-	box.AddXYZ(2, 1, 1, 1)
+	shape.AddXYZ(2, -1, 1, 1)
+	shape.AddXYZ(2, -1, -1, 1)
+	shape.AddXYZ(2, 1, -1, 1)
+	shape.AddXYZ(2, 1, 1, 1)
 
-	box.AddXYZ(3, -1, -1, 1)
-	box.AddXYZ(3, -1, -1, -1)
-	box.AddXYZ(3, 1, -1, -1)
-	box.AddXYZ(3, 1, -1, 1)
-	box.Scale(w, h, d)
-	return box
+	shape.AddXYZ(3, -1, -1, 1)
+	shape.AddXYZ(3, -1, -1, -1)
+	shape.AddXYZ(3, 1, -1, -1)
+	shape.AddXYZ(3, 1, -1, 1)
+	shape.Scale(w, h, d)
+	return shape
 }
 
-// Cone creates a cone shape.
+// Cone creates a 3d cone shape made of a number of slices.
 func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
-	cyl := &Shape{
+	shape := &Shape{
 		make([]PointList, slices),
 		true,
 	}
@@ -48,57 +48,18 @@ func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
 		for j := 0; j < res; j++ {
 			t := blmath.Tau * float64(j) / float64(res)
 			y := float64(i)/(float64(slices)-1)*height - height/2
-			cyl.AddXYZ(i, math.Cos(t)*radius, y, math.Sin(t)*radius)
+			shape.AddXYZ(i, math.Cos(t)*radius, y, math.Sin(t)*radius)
 		}
-	}
-	return cyl
-}
-
-// Cylinder creates a cylindar shape.
-func Cylinder(height, radius float64, slices, res int) *Shape {
-	return Cone(height, radius, radius, slices, res)
-}
-
-// Torus creates a 3d torus.
-func Torus(r1, r2 float64, slices, res int) *Shape {
-	torus := &Shape{
-		make([]PointList, slices),
-		true,
-	}
-	fslice := float64(slices)
-	dt := blmath.Tau / float64(res)
-	for i := 0.0; i < fslice; i++ {
-		angle := i / fslice * blmath.Tau
-		path := NewPointList()
-		for t := 0.0; t <= blmath.Tau-dt; t += dt {
-			path.AddXYZ(r1+math.Cos(t)*r2, math.Sin(t)*r2, 0)
-		}
-		path.RotateY(angle)
-		torus.Add(path)
-	}
-	return torus
-}
-
-// TorusKnot creates a torus knot shape
-func TorusKnot(p, q, scale, res float64) *Shape {
-	shape := NewShape(1, false)
-	res = 1.0 / res
-	for t := 0.0; t < blmath.Tau; t += res {
-		r := math.Cos(q*t) + 3
-		x := r * math.Cos(p*t)
-		y := r * math.Sin(p*t)
-		z := -math.Sin(q * t)
-		shape.AddXYZ(
-			0,
-			x*scale,
-			y*scale,
-			z*scale,
-		)
 	}
 	return shape
 }
 
-// GridPlane creates a rect containing a grid.
+// Cylinder creates a 3d cylinder shape made of a number of slices.
+func Cylinder(height, radius float64, slices, res int) *Shape {
+	return Cone(height, radius, radius, slices, res)
+}
+
+// GridPlane creates a 3d plane containing a grid.
 func GridPlane(w, d, res float64) *Shape {
 	shape := NewShape(0, false)
 	for x := -w / 2; x <= w/2; x += res {
@@ -116,31 +77,9 @@ func GridPlane(w, d, res float64) *Shape {
 	return shape
 }
 
-// Sphere creates a 3d sphere.
-func Sphere(radius float64, slices, res int) *Shape {
-	s := &Shape{
-		[]PointList{},
-		true,
-	}
-	fslice := float64(slices)
-	dt := blmath.Tau / float64(res)
-	for i := 0.0; i < fslice; i++ {
-		path := NewPointList()
-		a := i / fslice * math.Pi
-		for t := 0.0; t <= blmath.Tau-dt; t += dt {
-			y := math.Cos(a)
-			r := math.Sin(a)
-			path.AddXYZ(math.Cos(t)*r, y, math.Sin(t)*r)
-		}
-		s.Add(path)
-	}
-	s.UniScale(radius)
-	return s
-}
-
-// Pyramid creates a pyramid shape.
+// Pyramid creates a 3d pyramid shape.
 func Pyramid(height, baseRadius float64, sides int) *Shape {
-	p := &Shape{
+	shape := &Shape{
 		[]PointList{},
 		true,
 	}
@@ -156,7 +95,68 @@ func Pyramid(height, baseRadius float64, sides int) *Shape {
 		z = math.Sin(a2) * baseRadius
 		side.AddXYZ(x, y, z)
 		side.AddXYZ(0, -height/2, 0)
-		p.Add(side)
+		shape.Add(side)
 	}
-	return p
+	return shape
+}
+
+// Sphere creates a 3d sphere made of a number of slices.
+func Sphere(radius float64, slices, res int) *Shape {
+	shape := &Shape{
+		[]PointList{},
+		true,
+	}
+	fslice := float64(slices)
+	dt := blmath.Tau / float64(res)
+	for i := 0.0; i < fslice; i++ {
+		path := NewPointList()
+		a := i / fslice * math.Pi
+		for t := 0.0; t <= blmath.Tau-dt; t += dt {
+			y := math.Cos(a)
+			r := math.Sin(a)
+			path.AddXYZ(math.Cos(t)*r, y, math.Sin(t)*r)
+		}
+		shape.Add(path)
+	}
+	shape.UniScale(radius)
+	return shape
+}
+
+// Torus creates a 3d torus made of a number of slices.
+func Torus(r1, r2 float64, slices, res int) *Shape {
+	shape := &Shape{
+		make([]PointList, slices),
+		true,
+	}
+	fslice := float64(slices)
+	dt := blmath.Tau / float64(res)
+	for i := 0.0; i < fslice; i++ {
+		angle := i / fslice * blmath.Tau
+		path := NewPointList()
+		for t := 0.0; t <= blmath.Tau-dt; t += dt {
+			path.AddXYZ(r1+math.Cos(t)*r2, math.Sin(t)*r2, 0)
+		}
+		path.RotateY(angle)
+		shape.Add(path)
+	}
+	return shape
+}
+
+// TorusKnot creates a 3d torus knot shape made of one long path that wraps around the torus.
+func TorusKnot(p, q, scale, res float64) *Shape {
+	shape := NewShape(1, false)
+	res = 1.0 / res
+	for t := 0.0; t < blmath.Tau; t += res {
+		r := math.Cos(q*t) + 3
+		x := r * math.Cos(p*t)
+		y := r * math.Sin(p*t)
+		z := -math.Sin(q * t)
+		shape.AddXYZ(
+			0,
+			x*scale,
+			y*scale,
+			z*scale,
+		)
+	}
+	return shape
 }

@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-// String represents a 3d character string.
-type String struct {
-	Orig    string
-	Letters []*Shape
-}
+const font_half_width = 50.0
+
+//////////////////////////////
+// Font data
+//////////////////////////////
 
 // FontType defines which font will be used.
 type FontType int
@@ -21,7 +21,20 @@ const (
 	FontAsteroid = iota
 	// FontArcade uses the Arcade Font.
 	FontArcade
+	// maybe more to come...
 )
+
+//////////////////////////////
+// String type
+//////////////////////////////
+
+// String represents a 3d character string.
+// Initially this only holds a list of shapes, each on representing one letter in the string.
+// Calling one of the `As...` methods returns a single unified shape object.
+type String struct {
+	Orig    string
+	Letters []*Shape
+}
 
 // NewString creates a new 3d string object.
 func NewString(str string, font FontType) *String {
@@ -32,44 +45,19 @@ func NewString(str string, font FontType) *String {
 		paths = append(paths, char)
 	}
 	return &String{str, paths}
-
 }
 
-// AsCylinder creates a path list representing the string passed in.
-func (s *String) AsCylinder(radius, spacing float64) *Shape {
-	shape := &Shape{
-		[]PointList{},
-		false,
-	}
-	for _, pl := range s.Letters {
-		shape.Paths = append(shape.Paths, pl.TranslatedZ(-radius).Paths...)
-		shape.RotateY(math.Atan2(50+spacing, radius) * 2)
-	}
-	return shape
-}
-
-// AsLine returns the lists in this string as a single shape.
-func (s *String) AsLine(spacing float64) *Shape {
-	shape := &Shape{
-		[]PointList{},
-		false,
-	}
-	for _, pl := range s.Letters {
-		shape.TranslateX(-100 - spacing)
-		shape.Paths = append(shape.Paths, pl.Clone().Paths...)
-	}
-	shape.TranslateX((50 + spacing) * float64(len(s.Letters)))
-	return shape
-}
-
-// ParseChar parses a single character into a 3d object.
+// ParseChar parses a single character into a single 3d shape.
+// The font data is initially sized from -1 to +1 on the x-axis.
+// Height will depend on the font.
+// Each character is scaled to 100 units wide on creation (-50 to +50).
+// The string shape can be scaled further later.
 func ParseChar(char string, font FontType) *Shape {
 	fontData := arcadeFont
 	if font == FontAsteroid {
 		fontData = asteroidFont
 	}
 	charData := fontData[char]
-	// charData := asteroidFont[char]
 	strokes := strings.Split(charData, ":")
 	shape := &Shape{
 		[]PointList{},
@@ -80,8 +68,6 @@ func ParseChar(char string, font FontType) *Shape {
 		coords := strings.Split(stroke, " ")
 		path := NewPointList()
 		for _, coord := range coords {
-			// x, _ := strconv.ParseFloat(string(coord[0]), 64)
-			// y, _ := strconv.ParseFloat(string(coord[1]), 64)
 			xi, _ := strconv.ParseInt(string(coord[0]), 16, 64)
 			yi, _ := strconv.ParseInt(string(coord[1]), 16, 64)
 			x := float64(xi)/4.0 - 1.0
@@ -90,10 +76,44 @@ func ParseChar(char string, font FontType) *Shape {
 		}
 		shape.Add(path)
 	}
-	shape.UniScale(50)
+	shape.UniScale(font_half_width)
 	return shape
 }
 
+// AsCylinder creates a shape consisting of the string wrapped around a cylinder.
+func (s *String) AsCylinder(radius, spacing float64) *Shape {
+	shape := &Shape{
+		[]PointList{},
+		false,
+	}
+	for _, pl := range s.Letters {
+		shape.Paths = append(shape.Paths, pl.TranslatedZ(-radius).Paths...)
+		shape.RotateY(math.Atan2(font_half_width+spacing, radius) * 2)
+	}
+	return shape
+}
+
+// AsLine creates a shape consisting of the string laid out in a signle line.
+func (s *String) AsLine(spacing float64) *Shape {
+	shape := &Shape{
+		[]PointList{},
+		false,
+	}
+	for _, pl := range s.Letters {
+		shape.TranslateX(-100 - spacing)
+		shape.Paths = append(shape.Paths, pl.Clone().Paths...)
+	}
+	shape.TranslateX((font_half_width + spacing) * float64(len(s.Letters)))
+	return shape
+}
+
+//////////////////////////////
+// Font definitions
+//////////////////////////////
+
+// arcadeFont is the path data for this font.
+// adapted from https://github.com/coolbutuseless/arcadefont/blob/master/data-raw/create-arcade-font.R
+// with some changes.
 var arcadeFont = map[string]string{
 	" ":  "00",
 	"!":  "00 01 11 10 00 :  03 08 18 13 03",
@@ -166,6 +186,9 @@ var arcadeFont = map[string]string{
 	"~":  "04 26 64 86",
 }
 
+// asteroidFont is the path data for this font.
+// adapted from https://github.com/osresearch/vst/blob/master/teensyv/asteroids_font.c
+// with some changes.
 var asteroidFont = map[string]string{
 	" ":  "00",
 	"!":  "40 32 52 40 : 44 4C",

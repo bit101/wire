@@ -13,7 +13,7 @@ func NewPointList() PointList {
 	return PointList{}
 }
 
-// Clone returns a copy of this pointlist.
+// Clone returns a deep copy of this pointlist.
 func (p PointList) Clone() PointList {
 	list := NewPointList()
 	for _, point := range p {
@@ -27,12 +27,13 @@ func (p *PointList) Add(point *Point) {
 	*p = append(*p, point)
 }
 
-// AddXYZ adds a new point to this list.
+// AddXYZ creates and adds a new point to this list.
 func (p *PointList) AddXYZ(x, y, z float64) {
 	*p = append(*p, NewPoint(x, y, z))
 }
 
 // Project projects this 3d point list to a 2d point list.
+// This returns a list of 2d points as well as a list of scale values for each point.
 func (p PointList) Project() (geom.PointList, []float64) {
 	size := len(p)
 	list := make(geom.PointList, size)
@@ -50,6 +51,8 @@ func shouldDraw(p0, p1 *Point) bool {
 }
 
 // Stroke strokes a path on a point list.
+// It first projects the 3d points to 2d points, then draws each segment between points,
+// ignoring segments that fall outside the near and far bounds.
 func (p PointList) Stroke(context Context, closed bool) {
 	points, scales := p.Project()
 	lineWidth := context.GetLineWidth()
@@ -86,11 +89,18 @@ func (p PointList) Get(index int) *Point {
 	return p[index]
 }
 
+// First returns the first point in the list.
+func (p PointList) First() *Point {
+	return p[0]
+}
+
 // Last returns the last point in the list.
 func (p PointList) Last() *Point {
 	return p[len(p)-1]
 }
 
+// Subdivide creates a new point between each pair of points in the list.
+// It will iterate `times` number of iterations, so the number of resulting points will go up fast.
 func (p *PointList) Subdivide(times int) {
 	for t := 0; t < times; t++ {
 		newList := NewPointList()
@@ -109,119 +119,119 @@ func (p *PointList) Subdivide(times int) {
 // Transform in place.
 //////////////////////////////
 
-// TranslateX translates this pointlist on the x-axis in place.
+// TranslateX translates each point in this pointlist on the x-axis, in place.
 func (p PointList) TranslateX(tx float64) {
 	for _, point := range p {
 		point.TranslateX(tx)
 	}
 }
 
-// TranslateY translates this pointlist on the y-axis in place.
+// TranslateY translates each point in this pointlist on the y-axis, in place.
 func (p PointList) TranslateY(ty float64) {
 	for _, point := range p {
 		point.TranslateY(ty)
 	}
 }
 
-// TranslateZ translates this pointlist on the z-axis in place.
+// TranslateZ translates each point in this pointlist on the z-axis, in place.
 func (p PointList) TranslateZ(tz float64) {
 	for _, point := range p {
 		point.TranslateZ(tz)
 	}
 }
 
-// Translate translates this pointlist in place.
+// Translate translates each point in this pointlist on all axes, in place.
 func (p PointList) Translate(tx, ty, tz float64) {
 	for _, point := range p {
 		point.Translate(tx, ty, tz)
 	}
 }
 
-// RotateX rotates this pointlist around the x-axis in place.
+// RotateX rotates each point in this pointlist around the x-axis, in place.
 func (p PointList) RotateX(angle float64) {
 	for _, point := range p {
 		point.RotateX(angle)
 	}
 }
 
-// RotateY rotates this pointlist around the y-axis in place.
+// RotateY rotates each point in this pointlist around the y-axis, in place.
 func (p PointList) RotateY(angle float64) {
 	for _, point := range p {
 		point.RotateY(angle)
 	}
 }
 
-// RotateZ rotates this pointlist around the z-axis in place.
+// RotateZ rotates each point in this pointlist around the z-axis, in place.
 func (p PointList) RotateZ(angle float64) {
 	for _, point := range p {
 		point.RotateZ(angle)
 	}
 }
 
-// Rotate rotates this pointlist in place.
+// Rotate rotates each point in this pointlist around all axes, in place.
 func (p PointList) Rotate(rx, ry, rz float64) {
 	for _, point := range p {
 		point.Rotate(rx, ry, rz)
 	}
 }
 
-// ScaleX scales this pointlist on the x-axis, in place.
+// ScaleX scales each point in this pointlist on the x-axis, in place.
 func (p PointList) ScaleX(scale float64) {
 	for _, point := range p {
 		point.ScaleX(scale)
 	}
 }
 
-// ScaleY scales this pointlist on the y-axis, in place.
+// ScaleY scales each point in this pointlist on the y-axis, in place.
 func (p PointList) ScaleY(scale float64) {
 	for _, point := range p {
 		point.ScaleY(scale)
 	}
 }
 
-// ScaleZ scales this pointlist on the z-axis, in place.
+// ScaleZ scales each point in this pointlist on the z-axis, in place.
 func (p PointList) ScaleZ(scale float64) {
 	for _, point := range p {
 		point.ScaleZ(scale)
 	}
 }
 
-// Scale scales this pointlist in place.
+// Scale scales each point in this pointlist on all axes, in place.
 func (p PointList) Scale(sx, sy, sz float64) {
 	for _, point := range p {
 		point.Scale(sx, sy, sz)
 	}
 }
 
-// UniScale scales this pointlist in place.
+// UniScale scales each point in this pointlist by the same amount on each axis, in place.
 func (p PointList) UniScale(scale float64) {
 	for _, point := range p {
 		point.UniScale(scale)
 	}
 }
 
-// RandomizeX randomizes this pointlist on the x-axis, in place.
+// RandomizeX randomizes each point in this pointlist on the x-axis, in place.
 func (p PointList) RandomizeX(amount float64) {
 	for _, point := range p {
 		point.RandomizeX(amount)
 	}
 }
 
-// RandomizeY randomizes this pointlist on the y-axis, in place.
+// RandomizeY randomizes each point in this pointlist on the y-axis, in place.
 func (p PointList) RandomizeY(amount float64) {
 	for _, point := range p {
 		point.RandomizeY(amount)
 	}
 }
 
-// RandomizeZ randomizes this pointlist on the z-axis, in place.
+// RandomizeZ randomizes each point in this pointlist on the z-axis, in place.
 func (p PointList) RandomizeZ(amount float64) {
 	for _, point := range p {
 		point.RandomizeZ(amount)
 	}
 }
 
-// Randomize randomizes this pointlist in place.
+// Randomize randomizes each point in this pointlist on all axes, in place.
 func (p PointList) Randomize(amount float64) {
 	for _, point := range p {
 		point.Randomize(amount)
@@ -253,7 +263,7 @@ func (p *PointList) TranslatedZ(tz float64) PointList {
 	return p1
 }
 
-// Translated returns a copy of this pointlist, translated.
+// Translated returns a copy of this pointlist, translated on all axes.
 func (p PointList) Translated(tx, ty, tz float64) PointList {
 	p1 := p.Clone()
 	p1.Translate(tx, ty, tz)
@@ -281,7 +291,7 @@ func (p PointList) RotatedZ(angle float64) PointList {
 	return p1
 }
 
-// Rotated returns a copy of this pointlist, rotated.
+// Rotated returns a copy of this pointlist, rotated on all axes.
 func (p PointList) Rotated(rx, ry, rz float64) PointList {
 	p1 := p.Clone()
 	p1.Rotate(rx, ry, rz)
@@ -295,28 +305,28 @@ func (p PointList) ScaledX(scale float64) PointList {
 	return p1
 }
 
-// ScaledY returns a copy of this pointlist, scaled on the x-axis.
+// ScaledY returns a copy of this pointlist, scaled on the y-axis.
 func (p PointList) ScaledY(scale float64) PointList {
 	p1 := p.Clone()
 	p1.ScaleY(scale)
 	return p1
 }
 
-// ScaledZ returns a copy of this pointlist, scaled on the x-axis.
+// ScaledZ returns a copy of this pointlist, scaled on the z-axis.
 func (p PointList) ScaledZ(scale float64) PointList {
 	p1 := p.Clone()
 	p1.ScaleZ(scale)
 	return p1
 }
 
-// Scaled returns a copy of this pointlist, scaled.
+// Scaled returns a copy of this pointlist, scaled on all axes.
 func (p PointList) Scaled(sx, sy, sz float64) PointList {
 	p1 := p.Clone()
 	p1.Scale(sx, sy, sz)
 	return p1
 }
 
-// UniScaled returns a copy of this pointlist, scaled.
+// UniScaled returns a copy of this pointlist, scaled by the same amount on each axis.
 func (p PointList) UniScaled(scale float64) PointList {
 	p1 := p.Clone()
 	p1.UniScale(scale)
@@ -344,7 +354,7 @@ func (p PointList) RandomizedZ(amount float64) PointList {
 	return p1
 }
 
-// Randomized returns a copy of this pointlist, randomized.
+// Randomized returns a copy of this pointlist, randomized on all axes.
 func (p PointList) Randomized(amount float64) PointList {
 	p1 := p.Clone()
 	p1.Randomize(amount)
