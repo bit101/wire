@@ -77,6 +77,14 @@ func (p *Point) Project() (*geom.Point, float64) {
 	return geom.NewPoint(World.CX+p.X*scale, World.CY+p.Y*scale), scale
 }
 
+// Distance returns the distance from this point to another point.
+func (p *Point) Distance(other *Point) float64 {
+	dx := other.X - p.X
+	dy := other.Y - p.Y
+	dz := other.Z - p.Z
+	return math.Sqrt(dx*dx + dy*dy + dz*dz)
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////

@@ -112,6 +112,20 @@ func (s *Shape) Subdivide(times int) {
 	}
 }
 
+// Cull removes points from the shape that do not satisfy the cull function. Modifies shape in place.
+func (s *Shape) Cull(cullFunc func(*Point) bool) {
+	for i := 0; i < len(s.Paths); i++ {
+		s.Paths[i].Cull(cullFunc)
+	}
+}
+
+// Culled returns a new shape with points removed that do not satisfy the cull function.
+func (s *Shape) Culled(cullFunc func(*Point) bool) *Shape {
+	s1 := s.Clone()
+	s1.Cull(cullFunc)
+	return s1
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////

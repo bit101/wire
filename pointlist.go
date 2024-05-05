@@ -153,6 +153,24 @@ func (p *PointList) Subdivide(times int) {
 	}
 }
 
+// Cull removes points from the list that do not satisfy the cull function. Modifies list in place.
+func (p *PointList) Cull(cullFunc func(*Point) bool) {
+	newList := NewPointList()
+	for _, point := range *p {
+		if cullFunc(point) {
+			newList.Add(point)
+		}
+	}
+	*p = newList
+}
+
+// Culled returns a new point list with points removed that do not satisfy the cull function.
+func (p PointList) Culled(cullFunc func(*Point) bool) PointList {
+	p1 := p.Clone()
+	p1.Cull(cullFunc)
+	return p1
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////
