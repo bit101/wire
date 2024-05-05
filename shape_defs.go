@@ -5,22 +5,14 @@ import (
 	"math"
 
 	"github.com/bit101/bitlib/blmath"
-	"github.com/bit101/bitlib/geom"
 )
 
-// Context interface to allow for drawing functions.
-type Context interface {
-	StrokePath(geom.PointList, bool)
-	MoveTo(float64, float64)
-	LineTo(float64, float64)
-	Stroke()
-	ClosePath()
-	SetLineWidth(float64)
-	GetLineWidth() float64
-}
-
-func Box(w, h, d float64) PathList {
-	box := NewPathList(4)
+// Box creates a 3d box.
+func Box(w, h, d float64) *Shape {
+	box := &Shape{
+		make([]PointList, 4),
+		false,
+	}
 
 	box.AddXYZ(0, -1, -1, -1)
 	box.AddXYZ(0, -1, 1, -1)
@@ -46,8 +38,11 @@ func Box(w, h, d float64) PathList {
 }
 
 // Cone creates a cone shape.
-func Cone(height, radius0, radius1 float64, slices, res int) PathList {
-	cyl := NewPathList(slices)
+func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
+	cyl := &Shape{
+		make([]PointList, slices),
+		true,
+	}
 	for i := 0; i < slices; i++ {
 		radius := blmath.Map(float64(i), 0, float64(slices-1), radius0, radius1)
 		for j := 0; j < res; j++ {
@@ -60,13 +55,16 @@ func Cone(height, radius0, radius1 float64, slices, res int) PathList {
 }
 
 // Cylinder creates a cylindar shape.
-func Cylinder(height, radius float64, slices, res int) PathList {
+func Cylinder(height, radius float64, slices, res int) *Shape {
 	return Cone(height, radius, radius, slices, res)
 }
 
 // Torus creates a 3d torus.
-func Torus(r1, r2 float64, slices, res int) PathList {
-	torus := NewPathList(slices)
+func Torus(r1, r2 float64, slices, res int) *Shape {
+	torus := &Shape{
+		make([]PointList, slices),
+		true,
+	}
 	fslice := float64(slices)
 	dt := blmath.Tau / float64(res)
 	for i := 0.0; i < fslice; i++ {
@@ -81,9 +79,49 @@ func Torus(r1, r2 float64, slices, res int) PathList {
 	return torus
 }
 
+// TorusKnot creates a torus knot shape
+func TorusKnot(p, q, scale, res float64) *Shape {
+	shape := NewShape(1, false)
+	res = 1.0 / res
+	for t := 0.0; t < blmath.Tau; t += res {
+		r := math.Cos(q*t) + 3
+		x := r * math.Cos(p*t)
+		y := r * math.Sin(p*t)
+		z := -math.Sin(q * t)
+		shape.AddXYZ(
+			0,
+			x*scale,
+			y*scale,
+			z*scale,
+		)
+	}
+	return shape
+}
+
+// GridPlane creates a rect containing a grid.
+func GridPlane(w, d, res float64) *Shape {
+	shape := NewShape(0, false)
+	for x := -w / 2; x <= w/2; x += res {
+		path := NewPointList()
+		path.AddXYZ(x, 0, -d/2)
+		path.AddXYZ(x, 0, d/2)
+		shape.Add(path)
+	}
+	for z := -d / 2; z <= d/2; z += res {
+		path := NewPointList()
+		path.AddXYZ(-w/2, 0, z)
+		path.AddXYZ(w/2, 0, z)
+		shape.Add(path)
+	}
+	return shape
+}
+
 // Sphere creates a 3d sphere.
-func Sphere(radius float64, slices, res int) PathList {
-	s := NewPathList(0)
+func Sphere(radius float64, slices, res int) *Shape {
+	s := &Shape{
+		[]PointList{},
+		true,
+	}
 	fslice := float64(slices)
 	dt := blmath.Tau / float64(res)
 	for i := 0.0; i < fslice; i++ {
@@ -100,8 +138,12 @@ func Sphere(radius float64, slices, res int) PathList {
 	return s
 }
 
-func Pyramid(height, baseRadius float64, sides int) PathList {
-	p := NewPathList(0)
+// Pyramid creates a pyramid shape.
+func Pyramid(height, baseRadius float64, sides int) *Shape {
+	p := &Shape{
+		[]PointList{},
+		true,
+	}
 	for i := 0; i < sides; i++ {
 		side := NewPointList()
 		a1 := float64(i) / float64(sides) * blmath.Tau

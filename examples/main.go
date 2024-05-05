@@ -24,7 +24,7 @@ func main() {
 }
 
 var (
-	sphere wire.PathList
+	sphere *wire.Shape
 )
 
 func init() {
@@ -42,9 +42,9 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 	s := sphere.Rotated(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
 	context.SetLineWidth(1)
-	s.Stroke(context, true)
+	s.Stroke(context)
 
 	context.GaussianBlur(20)
 	context.SetLineWidth(0.5)
-	s.Stroke(context, true)
+	s.Stroke(context)
 }

@@ -19,6 +19,13 @@ var World = worldDef{
 	ScaleLineWidth: true,
 }
 
+// CenterWorld sets the center of the world.
+func CenterWorld(cx, cy, cz float64) {
+	World.CX = cx
+	World.CY = cy
+	World.CZ = cz
+}
+
 // Visible returns whether or not a point should be visible.
 func Visible(point *Point) bool {
 	if point.Z+World.CZ < World.NearZ {

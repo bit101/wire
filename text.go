@@ -10,7 +10,7 @@ import (
 // String represents a 3d character string.
 type String struct {
 	Orig    string
-	Letters []PathList
+	Letters []*Shape
 }
 
 // FontType defines which font will be used.
@@ -26,7 +26,7 @@ const (
 // NewString creates a new 3d string object.
 func NewString(str string, font FontType) *String {
 	str = strings.ToUpper(str)
-	paths := []PathList{}
+	paths := []*Shape{}
 	for _, s := range str {
 		char := ParseChar(string(s), font)
 		paths = append(paths, char)
@@ -36,28 +36,34 @@ func NewString(str string, font FontType) *String {
 }
 
 // AsCylinder creates a path list representing the string passed in.
-func (s *String) AsCylinder(radius, spacing float64) PathList {
-	list := NewPathList(0)
-	for _, pl := range s.Letters {
-		list = append(list, pl.TranslatedZ(-radius)...)
-		list.RotateY(math.Atan2(50+spacing, radius) * 2)
+func (s *String) AsCylinder(radius, spacing float64) *Shape {
+	shape := &Shape{
+		[]PointList{},
+		false,
 	}
-	return list
+	for _, pl := range s.Letters {
+		shape.Paths = append(shape.Paths, pl.TranslatedZ(-radius).Paths...)
+		shape.RotateY(math.Atan2(50+spacing, radius) * 2)
+	}
+	return shape
 }
 
-// AsLine returns the lists in this string as a single PathList.
-func (s *String) AsLine(spacing float64) PathList {
-	list := NewPathList(0)
-	for _, pl := range s.Letters {
-		list.TranslateX(-100 - spacing)
-		list = append(list, pl.Clone()...)
+// AsLine returns the lists in this string as a single shape.
+func (s *String) AsLine(spacing float64) *Shape {
+	shape := &Shape{
+		[]PointList{},
+		false,
 	}
-	list.TranslateX((50 + spacing) * float64(len(s.Letters)))
-	return list
+	for _, pl := range s.Letters {
+		shape.TranslateX(-100 - spacing)
+		shape.Paths = append(shape.Paths, pl.Clone().Paths...)
+	}
+	shape.TranslateX((50 + spacing) * float64(len(s.Letters)))
+	return shape
 }
 
 // ParseChar parses a single character into a 3d object.
-func ParseChar(char string, font FontType) PathList {
+func ParseChar(char string, font FontType) *Shape {
 	fontData := arcadeFont
 	if font == FontAsteroid {
 		fontData = asteroidFont
@@ -65,7 +71,10 @@ func ParseChar(char string, font FontType) PathList {
 	charData := fontData[char]
 	// charData := asteroidFont[char]
 	strokes := strings.Split(charData, ":")
-	charPathList := NewPathList(0)
+	shape := &Shape{
+		[]PointList{},
+		false,
+	}
 	for _, stroke := range strokes {
 		stroke = strings.TrimSpace(stroke)
 		coords := strings.Split(stroke, " ")
@@ -79,10 +88,10 @@ func ParseChar(char string, font FontType) PathList {
 			y := 1.0 - float64(yi)/4.0
 			path.AddXYZ(x, y, 0)
 		}
-		charPathList.Add(path)
+		shape.Add(path)
 	}
-	charPathList.UniScale(50)
-	return charPathList
+	shape.UniScale(50)
+	return shape
 }
 
 var arcadeFont = map[string]string{
