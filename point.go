@@ -18,6 +18,54 @@ func NewPoint(x, y, z float64) *Point {
 	return &Point{x, y, z}
 }
 
+// RandomPointInBox creates a new 3d point within a 3d box of the given dimensions.
+// The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
+func RandomPointInBox(w, h, d float64) *Point {
+	return NewPoint(
+		random.FloatRange(-w/2, w/2),
+		random.FloatRange(-h/2, h/2),
+		random.FloatRange(-d/2, d/2),
+	)
+}
+
+// RandomPointOnSphere creates a random 3d point ON a sphere of the given radius.
+func RandomPointOnSphere(radius float64) *Point {
+	x := random.FloatRange(-1, 1)
+	y := random.FloatRange(-1, 1)
+	z := random.FloatRange(-1, 1)
+	norm := 1 / math.Sqrt(x*x+y*y+z*z)
+	return NewPoint(x*norm*radius, y*norm*radius, z*norm*radius)
+}
+
+// RandomPointInSphere creates a random 3d point IN a sphere of the given radius.
+func RandomPointInSphere(radius float64) *Point {
+	x := random.FloatRange(-1, 1)
+	y := random.FloatRange(-1, 1)
+	z := random.FloatRange(-1, 1)
+	norm := 1 / math.Sqrt(x*x+y*y+z*z)
+	radius = math.Sqrt(random.Float()) * radius
+	return NewPoint(x*norm*radius, y*norm*radius, z*norm*radius)
+}
+
+// RandomPointOnCylinder creates a random 3d point ON a cylinder of the given radius and height.
+func RandomPointOnCylinder(height, radius float64) *Point {
+	angle := random.Angle()
+	x := math.Cos(angle) * radius
+	y := random.FloatRange(-height/2, height/2)
+	z := math.Sin(angle) * radius
+	return NewPoint(x, y, z)
+}
+
+// RandomPointInCylinder creates a random 3d point IN a cylinder of the given radius and height.
+func RandomPointInCylinder(height, radius float64) *Point {
+	radius = math.Sqrt(random.Float()) * radius
+	angle := random.Angle()
+	x := math.Cos(angle) * radius
+	y := random.FloatRange(-height/2, height/2)
+	z := math.Sin(angle) * radius
+	return NewPoint(x, y, z)
+}
+
 // Clone returns a copy of this point.
 func (p *Point) Clone() *Point {
 	return NewPoint(p.X, p.Y, p.Z)

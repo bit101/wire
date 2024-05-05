@@ -12,6 +12,7 @@ import (
 // This is needed to avoid recursive dependencies between wire and cairo.
 type Context interface {
 	StrokePath(geom.PointList, bool)
+	FillCircle(float64, float64, float64)
 	MoveTo(float64, float64)
 	LineTo(float64, float64)
 	Stroke()
@@ -55,6 +56,32 @@ func (s *Shape) AddXYZ(index int, x, y, z float64) {
 	s.Paths[index].AddXYZ(x, y, z)
 }
 
+// AddRandomPointInBox creates and adds a new 3d point within a 3d box of the given dimensions.
+// The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
+func (s *Shape) AddRandomPointInBox(index int, w, h, d float64) {
+	s.AddPoint(index, RandomPointInBox(w, h, d))
+}
+
+// AddRandomPointOnSphere creates and adds a random 3d point ON a sphere of the given radius.
+func (s *Shape) AddRandomPointOnSphere(index int, radius float64) {
+	s.AddPoint(index, RandomPointOnSphere(radius))
+}
+
+// AddRandomPointInSphere creates and adds a random 3d point IN a sphere of the given radius.
+func (s *Shape) AddRandomPointInSphere(index int, radius float64) {
+	s.AddPoint(index, RandomPointInSphere(radius))
+}
+
+// AddRandomPointOnCylinder creates and adds a random 3d point ON a cylinder of the given radius and height.
+func (s *Shape) AddRandomPointOnCylinder(index int, height, radius float64) {
+	s.AddPoint(index, RandomPointOnCylinder(height, radius))
+}
+
+// AddRandomPointInCylinder creates and adds a random 3d point IN a cylinder of the given radius and height.
+func (s *Shape) AddRandomPointInCylinder(index int, height, radius float64) {
+	s.AddPoint(index, RandomPointInCylinder(height, radius))
+}
+
 // Clone returns a deep copy of this shape.
 func (s *Shape) Clone() *Shape {
 	clone := NewShape(0, s.Closed)
@@ -68,6 +95,13 @@ func (s *Shape) Clone() *Shape {
 func (s *Shape) Stroke(context Context) {
 	for _, path := range s.Paths {
 		path.Stroke(context, s.Closed)
+	}
+}
+
+// Points draws a filled circle for each point in the path.
+func (s *Shape) Points(context Context, radius float64) {
+	for _, path := range s.Paths {
+		path.Points(context, radius)
 	}
 }
 

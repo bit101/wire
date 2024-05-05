@@ -32,6 +32,32 @@ func (p *PointList) AddXYZ(x, y, z float64) {
 	*p = append(*p, NewPoint(x, y, z))
 }
 
+// AddRandomPointInBox creates and adds a new 3d point within a 3d box of the given dimensions.
+// The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
+func (p *PointList) AddRandomPointInBox(w, h, d float64) {
+	p.Add(RandomPointInBox(w, h, d))
+}
+
+// AddRandomPointOnSphere creates and adds a random 3d point ON a sphere of the given radius.
+func (p *PointList) AddRandomPointOnSphere(radius float64) {
+	p.Add(RandomPointOnSphere(radius))
+}
+
+// AddRandomPointInSphere creates and adds a random 3d point IN a sphere of the given radius.
+func (p *PointList) AddRandomPointInSphere(radius float64) {
+	p.Add(RandomPointInSphere(radius))
+}
+
+// AddRandomPointOnCylinder creates and adds a random 3d point ON a cylinder of the given radius and height.
+func (p *PointList) AddRandomPointOnCylinder(height, radius float64) {
+	p.Add(RandomPointOnCylinder(height, radius))
+}
+
+// AddRandomPointInCylinder creates and adds a random 3d point IN a cylinder of the given radius and height.
+func (p *PointList) AddRandomPointInCylinder(height, radius float64) {
+	p.Add(RandomPointInCylinder(height, radius))
+}
+
 // Project projects this 3d point list to a 2d point list.
 // This returns a list of 2d points as well as a list of scale values for each point.
 func (p PointList) Project() (geom.PointList, []float64) {
@@ -79,6 +105,18 @@ func (p PointList) Stroke(context Context, closed bool) {
 		context.Stroke()
 	}
 	context.SetLineWidth(lineWidth)
+}
+
+// Points draws a circle for each point in the list.
+func (p PointList) Points(context Context, radius float64) {
+	points, scales := p.Project()
+	for i := 0; i < len(points); i++ {
+		if Visible(p[i]) {
+			point := points[i]
+			scale := scales[i]
+			context.FillCircle(point.X, point.Y, radius*scale)
+		}
+	}
 }
 
 // Get returns the point at the given index. Negative indexes go in reverse from end.
