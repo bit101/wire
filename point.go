@@ -29,22 +29,26 @@ func RandomPointInBox(w, h, d float64) *Point {
 }
 
 // RandomPointOnSphere creates a random 3d point ON a sphere of the given radius.
+// https://app.wallabag.it/view/18373497
 func RandomPointOnSphere(radius float64) *Point {
-	x := random.FloatRange(-1, 1)
-	y := random.FloatRange(-1, 1)
-	z := random.FloatRange(-1, 1)
-	norm := 1 / math.Sqrt(x*x+y*y+z*z)
-	return NewPoint(x*norm*radius, y*norm*radius, z*norm*radius)
+	u := random.FloatRange(-1, 1)
+	t := random.Angle()
+	x := math.Sqrt(1-u*u) * math.Cos(t)
+	y := math.Sqrt(1-u*u) * math.Sin(t)
+	z := u
+	return NewPoint(x*radius, y*radius, z*radius)
 }
 
 // RandomPointInSphere creates a random 3d point IN a sphere of the given radius.
+// https://app.wallabag.it/view/18373497
 func RandomPointInSphere(radius float64) *Point {
-	x := random.FloatRange(-1, 1)
-	y := random.FloatRange(-1, 1)
-	z := random.FloatRange(-1, 1)
-	norm := 1 / math.Sqrt(x*x+y*y+z*z)
+	u := random.FloatRange(-1, 1)
+	t := random.Angle()
+	x := math.Sqrt(1-u*u) * math.Cos(t)
+	y := math.Sqrt(1-u*u) * math.Sin(t)
+	z := u
 	radius = math.Sqrt(random.Float()) * radius
-	return NewPoint(x*norm*radius, y*norm*radius, z*norm*radius)
+	return NewPoint(x*radius, y*radius, z*radius)
 }
 
 // RandomPointOnCylinder creates a random 3d point ON a cylinder of the given radius and height.
