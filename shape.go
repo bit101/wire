@@ -82,6 +82,20 @@ func (s *Shape) AddRandomPointInCylinder(index int, height, radius float64) {
 	s.AddPoint(index, RandomPointInCylinder(height, radius))
 }
 
+// AddRandomPointOnTorus creates and adds a random 3d point ON a torus.
+// radius1 is from the center of the torus to the center of the circle forming the torus.
+// radius2 is the radius of the circle forming the torus.
+func (s *Shape) AddRandomPointOnTorus(index int, radius1, radius2 float64) {
+	s.AddPoint(index, RandomPointOnTorus(radius1, radius2))
+}
+
+// AddRandomPointInTorus creates and adds a random 3d point IN a torus.
+// radius1 is from the center of the torus to the center of the circle forming the torus.
+// radius2 is the radius of the circle forming the torus.
+func (s *Shape) AddRandomPointInTorus(index int, radius1, radius2 float64) {
+	s.AddPoint(index, RandomPointInTorus(radius1, radius2))
+}
+
 // Clone returns a deep copy of this shape.
 func (s *Shape) Clone() *Shape {
 	clone := NewShape(0, s.Closed)
@@ -124,6 +138,13 @@ func (s *Shape) Culled(cullFunc func(*Point) bool) *Shape {
 	s1 := s.Clone()
 	s1.Cull(cullFunc)
 	return s1
+}
+
+// CullBox removes points that ar not within the defined box. Modifies the shape in place.
+func (s *Shape) CullBox(minX, minY, minZ, maxX, maxY, maxZ float64) {
+	for i := 0; i < len(s.Paths); i++ {
+		s.Paths[i].CullBox(minX, minY, minZ, maxX, maxY, maxZ)
+	}
 }
 
 //////////////////////////////

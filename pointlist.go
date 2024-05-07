@@ -58,6 +58,20 @@ func (p *PointList) AddRandomPointInCylinder(height, radius float64) {
 	p.Add(RandomPointInCylinder(height, radius))
 }
 
+// AddRandomPointOnTorus creates and adds a random 3d point ON a torus.
+// radius1 is from the center of the torus to the center of the circle forming the torus.
+// radius2 is the radius of the circle forming the torus.
+func (p *PointList) AddRandomPointOnTorus(radius1, radius2 float64) {
+	p.AddRandomPointOnTorus(radius1, radius2)
+}
+
+// AddRandomPointInTorus creates and adds a random 3d point IN a torus.
+// radius1 is from the center of the torus to the center of the circle forming the torus.
+// radius2 is the radius of the circle forming the torus.
+func (p *PointList) AddRandomPointInTorus(radius1, radius2 float64) {
+	p.AddRandomPointInTorus(radius1, radius2)
+}
+
 // Project projects this 3d point list to a 2d point list.
 // This returns a list of 2d points as well as a list of scale values for each point.
 func (p PointList) Project() (geom.PointList, []float64) {
@@ -169,6 +183,19 @@ func (p PointList) Culled(cullFunc func(*Point) bool) PointList {
 	p1 := p.Clone()
 	p1.Cull(cullFunc)
 	return p1
+}
+
+// CullBox removes points that ar not within the defined box. Modifies the shape in place.
+func (p *PointList) CullBox(minX, minY, minZ, maxX, maxY, maxZ float64) {
+	newList := NewPointList()
+	for _, point := range *p {
+		if point.X >= minX && point.X <= maxX &&
+			point.Y >= minY && point.Y <= maxY &&
+			point.Z >= minZ && point.Z <= maxZ {
+			newList.Add(point)
+		}
+	}
+	*p = newList
 }
 
 //////////////////////////////

@@ -70,6 +70,33 @@ func RandomPointInCylinder(height, radius float64) *Point {
 	return NewPoint(x, y, z)
 }
 
+// RandomPointOnTorus creates a random 3d point ON a torus.
+// radius1 is from the center of the torus to the center of the circle forming the torus.
+// radius2 is the radius of the circle forming the torus.
+func RandomPointOnTorus(radius1, radius2 float64) *Point {
+	t := random.Angle()
+	x := math.Cos(t)*radius2 + radius1
+	y := math.Sin(t) * radius2
+	z := 0.0
+	p := NewPoint(x, y, z)
+	p.RotateY(random.Angle())
+	return p
+}
+
+// RandomPointInTorus creates a random 3d point IN a torus.
+// radius1 is from the center of the torus to the center of the circle forming the torus.
+// radius2 is the radius of the circle forming the torus.
+func RandomPointInTorus(radius1, radius2 float64) *Point {
+	t := random.Angle()
+	radius2 *= math.Sqrt(random.Float())
+	x := math.Cos(t)*radius2 + radius1
+	y := math.Sin(t) * radius2
+	z := 0.0
+	p := NewPoint(x, y, z)
+	p.RotateY(random.Angle())
+	return p
+}
+
 // Clone returns a copy of this point.
 func (p *Point) Clone() *Point {
 	return NewPoint(p.X, p.Y, p.Z)

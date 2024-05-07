@@ -37,19 +37,32 @@ func Box(w, h, d float64) *Shape {
 	return shape
 }
 
+// CirclePath creates a single path defining a circle.
+func CirclePath(radius float64, res int) PointList {
+	list := NewPointList()
+	for i := 0; i < res; i++ {
+		t := blmath.Tau * float64(i) / float64(res)
+		list.AddXYZ(math.Cos(t)*radius, 0, math.Sin(t)*radius)
+	}
+	return list
+}
+
+// Circle creates a 3d cone shape made of a number of slices.
+func Circle(radius float64, res int) *Shape {
+	shape := NewShape(0, true)
+	shape.Add(CirclePath(radius, res))
+	return shape
+}
+
 // Cone creates a 3d cone shape made of a number of slices.
 func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
-	shape := &Shape{
-		make([]PointList, slices),
-		true,
-	}
+	shape := NewShape(0, true)
 	for i := 0; i < slices; i++ {
 		radius := blmath.Map(float64(i), 0, float64(slices-1), radius0, radius1)
-		for j := 0; j < res; j++ {
-			t := blmath.Tau * float64(j) / float64(res)
-			y := float64(i)/(float64(slices)-1)*height - height/2
-			shape.AddXYZ(i, math.Cos(t)*radius, y, math.Sin(t)*radius)
-		}
+		c := CirclePath(radius, res)
+		y := float64(i)/(float64(slices)-1)*height - height/2
+		c.TranslateY(y)
+		shape.Add(c)
 	}
 	return shape
 }
@@ -107,16 +120,11 @@ func Sphere(radius float64, slices, res int) *Shape {
 		true,
 	}
 	fslice := float64(slices)
-	dt := blmath.Tau / float64(res)
 	for i := 0.0; i < fslice; i++ {
-		path := NewPointList()
 		a := i / fslice * math.Pi
-		for t := 0.0; t <= blmath.Tau-dt; t += dt {
-			y := math.Cos(a)
-			r := math.Sin(a)
-			path.AddXYZ(math.Cos(t)*r, y, math.Sin(t)*r)
-		}
-		shape.Add(path)
+		c := CirclePath(math.Sin(a), res)
+		c.TranslateY(math.Cos(a))
+		shape.Add(c)
 	}
 	shape.UniScale(radius)
 	return shape
@@ -124,20 +132,15 @@ func Sphere(radius float64, slices, res int) *Shape {
 
 // Torus creates a 3d torus made of a number of slices.
 func Torus(r1, r2 float64, slices, res int) *Shape {
-	shape := &Shape{
-		make([]PointList, slices),
-		true,
-	}
+	shape := NewShape(0, true)
 	fslice := float64(slices)
-	dt := blmath.Tau / float64(res)
 	for i := 0.0; i < fslice; i++ {
 		angle := i / fslice * blmath.Tau
-		path := NewPointList()
-		for t := 0.0; t <= blmath.Tau-dt; t += dt {
-			path.AddXYZ(r1+math.Cos(t)*r2, math.Sin(t)*r2, 0)
-		}
-		path.RotateY(angle)
-		shape.Add(path)
+		c := CirclePath(r2, res)
+		c.RotateX(math.Pi / 2)
+		c.TranslateX(r1)
+		c.RotateY(angle)
+		shape.Add(c)
 	}
 	return shape
 }
