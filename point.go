@@ -4,18 +4,20 @@ package wire
 import (
 	"math"
 
-	"github.com/bit101/bitlib/geom"
+	"github.com/bit101/bitlib/blcolor"
 	"github.com/bit101/bitlib/random"
 )
 
 // Point is a 3d point.
 type Point struct {
-	X, Y, Z float64
+	X, Y, Z         float64
+	Px, Py, Scaling float64
+	color           *blcolor.Color
 }
 
 // NewPoint creates a new 3d point.
 func NewPoint(x, y, z float64) *Point {
-	return &Point{x, y, z}
+	return &Point{x, y, z, 0, 0, 0, nil}
 }
 
 // RandomPointInBox creates a new 3d point within a 3d box of the given dimensions.
@@ -99,13 +101,20 @@ func RandomPointInTorus(radius1, radius2 float64) *Point {
 
 // Clone returns a copy of this point.
 func (p *Point) Clone() *Point {
-	return NewPoint(p.X, p.Y, p.Z)
+	return &Point{p.X, p.Y, p.Z, p.Px, p.Py, p.Scaling, nil}
 }
 
-// Project projects this 3d point to a 2d point.
-func (p *Point) Project() (*geom.Point, float64) {
+// SetColor sets the color of this point. Setting to nil will use the current context source.
+func (p *Point) SetColor(color blcolor.Color) {
+	p.color = &color
+}
+
+// Project projects this 3d point to a 2d point, by setting the Px, Py and Scaling properties of this point.
+func (p *Point) Project() {
 	scale := World.FL / (World.CZ + p.Z)
-	return geom.NewPoint(World.CX+p.X*scale, World.CY+p.Y*scale), scale
+	p.Px = World.CX + p.X*scale
+	p.Py = World.CY + p.Y*scale
+	p.Scaling = scale
 }
 
 // Distance returns the distance from this point to another point.

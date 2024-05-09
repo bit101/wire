@@ -1,9 +1,7 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
-import (
-	"github.com/bit101/bitlib/geom"
-)
+import "slices"
 
 // PointList represents a list of 3d points.
 type PointList []*Point
@@ -74,16 +72,10 @@ func (p *PointList) AddRandomPointInTorus(radius1, radius2 float64) {
 
 // Project projects this 3d point list to a 2d point list.
 // This returns a list of 2d points as well as a list of scale values for each point.
-func (p PointList) Project() (geom.PointList, []float64) {
-	size := len(p)
-	list := make(geom.PointList, size)
-	scales := make([]float64, size)
-	for i, point := range p {
-		gp, scale := point.Project()
-		list[i] = gp
-		scales[i] = scale
+func (p PointList) Project() {
+	for _, point := range p {
+		point.Project()
 	}
-	return list, scales
 }
 
 func shouldDraw(p0, p1 *Point) bool {
@@ -94,32 +86,32 @@ func shouldDraw(p0, p1 *Point) bool {
 // It first projects the 3d points to 2d points, then draws each segment between points,
 // ignoring segments that fall outside the near and far bounds.
 func (p PointList) Stroke(context Context, closed bool) {
-	points, scales := p.Project()
+	p.Project()
 	lineWidth := context.GetLineWidth()
-	for i := 0; i < len(points)-1; i++ {
+	for i := 0; i < len(p)-1; i++ {
 		scale := 1.0
+		p0 := p[i]
+		p1 := p[i+1]
 		if World.ScaleLineWidth {
-			scale = (scales[i] + scales[i+1]) / 2
+			scale = (p0.Scaling + p1.Scaling) / 2
 		}
-		if shouldDraw(p[i], p[i+1]) {
-			p0 := points[i]
-			p1 := points[i+1]
+		if shouldDraw(p0, p1) {
 			context.SetLineWidth(lineWidth * scale)
-			context.MoveTo(p0.X, p0.Y)
-			context.LineTo(p1.X, p1.Y)
+			context.MoveTo(p0.Px, p0.Py)
+			context.LineTo(p1.Px, p1.Py)
 			context.Stroke()
 		}
 	}
-	if closed && shouldDraw(p[0], p.Last()) {
+	p0 := p.First()
+	p1 := p.Last()
+	if closed && shouldDraw(p0, p1) {
 		scale := 1.0
 		if World.ScaleLineWidth {
-			scale = (scales[0] + scales[len(points)-1]) / 2
+			scale = (p0.Scaling + p1.Scaling) / 2
 		}
-		p0 := points[0]
-		p1 := points[len(points)-1]
 		context.SetLineWidth(lineWidth * scale)
-		context.MoveTo(p0.X, p0.Y)
-		context.LineTo(p1.X, p1.Y)
+		context.MoveTo(p0.Px, p0.Py)
+		context.LineTo(p1.Px, p1.Py)
 		context.Stroke()
 	}
 	context.SetLineWidth(lineWidth)
@@ -127,12 +119,21 @@ func (p PointList) Stroke(context Context, closed bool) {
 
 // Points draws a circle for each point in the list.
 func (p PointList) Points(context Context, radius float64) {
-	points, scales := p.Project()
-	for i := 0; i < len(points); i++ {
-		if Visible(p[i]) {
-			point := points[i]
-			scale := scales[i]
-			context.FillCircle(point.X, point.Y, radius*scale)
+	p.Project()
+	slices.SortFunc(p, func(a, b *Point) int {
+		if a.Z > b.Z {
+			return -1
+		}
+		return 1
+	})
+	for _, point := range p {
+		if Visible(point) {
+			context.Save()
+			if point.color != nil {
+				context.SetSourceColor(*point.color)
+			}
+			context.FillCircle(point.Px, point.Py, radius*point.Scaling)
+			context.Restore()
 		}
 	}
 }

@@ -4,6 +4,7 @@ package wire
 import (
 	"log"
 
+	"github.com/bit101/bitlib/blcolor"
 	"github.com/bit101/bitlib/geom"
 )
 
@@ -19,6 +20,9 @@ type Context interface {
 	ClosePath()
 	SetLineWidth(float64)
 	GetLineWidth() float64
+	Save()
+	Restore()
+	SetSourceColor(blcolor.Color)
 }
 
 // Shape is a 3d shape composed of multiple 3d paths.
