@@ -99,7 +99,7 @@ func (p PointList) Stroke(context Context, closed bool) {
 	for i := 0; i < len(points)-1; i++ {
 		scale := 1.0
 		if World.ScaleLineWidth {
-			scale = scales[i]
+			scale = (scales[i] + scales[i+1]) / 2
 		}
 		if shouldDraw(p[i], p[i+1]) {
 			p0 := points[i]
@@ -111,9 +111,13 @@ func (p PointList) Stroke(context Context, closed bool) {
 		}
 	}
 	if closed && shouldDraw(p[0], p.Last()) {
+		scale := 1.0
+		if World.ScaleLineWidth {
+			scale = (scales[0] + scales[len(points)-1]) / 2
+		}
 		p0 := points[0]
 		p1 := points[len(points)-1]
-		context.SetLineWidth(lineWidth * scales[0])
+		context.SetLineWidth(lineWidth * scale)
 		context.MoveTo(p0.X, p0.Y)
 		context.LineTo(p1.X, p1.Y)
 		context.Stroke()
