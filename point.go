@@ -104,9 +104,14 @@ func (p *Point) Clone() *Point {
 	return &Point{p.X, p.Y, p.Z, p.Px, p.Py, p.Scaling, nil}
 }
 
-// SetColor sets the color of this point. Setting to nil will use the current context source.
+// SetColor sets the color of this point.
 func (p *Point) SetColor(color blcolor.Color) {
 	p.color = &color
+}
+
+// UnsetColor removes the custom color. Any drawing will use the active context source color.
+func (p *Point) UnsetColor() {
+	p.color = nil
 }
 
 // Project projects this 3d point to a 2d point, by setting the Px, Py and Scaling properties of this point.
