@@ -33,7 +33,7 @@ func Box(w, h, d float64) *Shape {
 	shape.AddSegmentByIndex(1, 5)
 	shape.AddSegmentByIndex(2, 6)
 	shape.AddSegmentByIndex(3, 7)
-	shape.Scale(w, h, d)
+	shape.Scale(w/2, h/2, d/2)
 	return shape
 }
 
@@ -130,15 +130,24 @@ func Pyramid(height, baseRadius float64, sides int) *Shape {
 }
 
 // Sphere creates a 3d sphere made of a number of slices.
-func Sphere(radius float64, slices, res int) *Shape {
+func Sphere(radius float64, long, lat int, showLong, showLat bool) *Shape {
 	shape := NewShape()
-	fslice := float64(slices)
-	for i := 0.0; i < fslice; i++ {
+	fslice := float64(long)
+	for i := 0.0; i <= fslice; i++ {
 		a := i / fslice * math.Pi
-		p, s := CirclePath(math.Sin(a), res)
+		p, s := CirclePath(math.Sin(a), lat)
 		p.TranslateY(math.Cos(a))
 		shape.Points = append(shape.Points, p...)
-		shape.Segments = append(shape.Segments, s...)
+		if showLat {
+			shape.Segments = append(shape.Segments, s...)
+		}
+	}
+	if showLong {
+		for i := 0; i < long; i++ {
+			for j := 0; j < lat; j++ {
+				shape.AddSegmentByIndex(i*lat+j, (i+1)*lat+j)
+			}
+		}
 	}
 	shape.UniScale(radius)
 	return shape
