@@ -117,8 +117,8 @@ func (p PointList) Stroke(context Context, closed bool) {
 	context.SetLineWidth(lineWidth)
 }
 
-// Points draws a circle for each point in the list.
-func (p PointList) Points(context Context, radius float64) {
+// RenderPoints draws a circle for each point in the list.
+func (p PointList) RenderPoints(context Context, radius float64) {
 	p.Project()
 	slices.SortFunc(p, func(a, b *Point) int {
 		if a.Z > b.Z {
@@ -156,6 +156,7 @@ func (p PointList) Last() *Point {
 	return p[len(p)-1]
 }
 
+/*
 // Subdivide creates a new point between each pair of points in the list.
 // It will iterate `times` number of iterations, so the number of resulting points will go up fast.
 func (p *PointList) Subdivide(times int) {
@@ -171,6 +172,7 @@ func (p *PointList) Subdivide(times int) {
 		*p = newList
 	}
 }
+*/
 
 // Cull removes points from the list that do not satisfy the cull function. Modifies list in place.
 func (p *PointList) Cull(cullFunc func(*Point) bool) {

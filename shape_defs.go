@@ -9,60 +9,70 @@ import (
 
 // Box creates a 3d box shape.
 func Box(w, h, d float64) *Shape {
-	shape := &Shape{
-		make([]PointList, 4),
-		false,
-	}
+	shape := NewShape()
+	shape.AddXYZ(-1, -1, -1)
+	shape.AddXYZ(-1, 1, -1)
+	shape.AddXYZ(1, 1, -1)
+	shape.AddXYZ(1, -1, -1)
+	shape.AddXYZ(-1, -1, 1)
+	shape.AddXYZ(-1, 1, 1)
+	shape.AddXYZ(1, 1, 1)
+	shape.AddXYZ(1, -1, 1)
 
-	shape.AddXYZ(0, -1, -1, -1)
-	shape.AddXYZ(0, -1, 1, -1)
-	shape.AddXYZ(0, 1, 1, -1)
-	shape.AddXYZ(0, 1, -1, -1)
+	shape.AddSegmentByIndex(0, 1)
+	shape.AddSegmentByIndex(1, 2)
+	shape.AddSegmentByIndex(2, 3)
+	shape.AddSegmentByIndex(3, 0)
 
-	shape.AddXYZ(1, -1, 1, -1)
-	shape.AddXYZ(1, -1, 1, 1)
-	shape.AddXYZ(1, 1, 1, 1)
-	shape.AddXYZ(1, 1, 1, -1)
+	shape.AddSegmentByIndex(4, 5)
+	shape.AddSegmentByIndex(5, 6)
+	shape.AddSegmentByIndex(6, 7)
+	shape.AddSegmentByIndex(7, 4)
 
-	shape.AddXYZ(2, -1, 1, 1)
-	shape.AddXYZ(2, -1, -1, 1)
-	shape.AddXYZ(2, 1, -1, 1)
-	shape.AddXYZ(2, 1, 1, 1)
-
-	shape.AddXYZ(3, -1, -1, 1)
-	shape.AddXYZ(3, -1, -1, -1)
-	shape.AddXYZ(3, 1, -1, -1)
-	shape.AddXYZ(3, 1, -1, 1)
+	shape.AddSegmentByIndex(0, 4)
+	shape.AddSegmentByIndex(1, 5)
+	shape.AddSegmentByIndex(2, 6)
+	shape.AddSegmentByIndex(3, 7)
 	shape.Scale(w, h, d)
 	return shape
 }
 
 // CirclePath creates a single path defining a circle.
-func CirclePath(radius float64, res int) PointList {
-	list := NewPointList()
+func CirclePath(radius float64, res int) (PointList, []*Segment) {
+	points := NewPointList()
+	segments := []*Segment{}
 	for i := 0; i < res; i++ {
 		t := blmath.Tau * float64(i) / float64(res)
-		list.AddXYZ(math.Cos(t)*radius, 0, math.Sin(t)*radius)
+		p := NewPoint(math.Cos(t)*radius, 0, math.Sin(t)*radius)
+		points.Add(p)
+		if i > 0 {
+			s := NewSegment(points[i-1], points[i])
+			segments = append(segments, s)
+		}
 	}
-	return list
+	segments = append(segments, NewSegment(points.Last(), points.First()))
+	return points, segments
 }
 
 // Circle creates a 3d cone shape made of a number of slices.
 func Circle(radius float64, res int) *Shape {
-	shape := NewShape(0, true)
-	shape.Add(CirclePath(radius, res))
+	shape := NewShape()
+	p, s := CirclePath(radius, res)
+	shape.Points = p
+	shape.Segments = s
 	return shape
 }
 
 // Cone creates a 3d cone shape made of a number of slices.
 func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
-	shape := NewShape(0, true)
+	shape := NewShape()
 	for i := 0; i < slices; i++ {
 		radius := blmath.Map(float64(i), 0, float64(slices-1), radius0, radius1)
-		c := CirclePath(radius, res)
+		p, s := CirclePath(radius, res)
 		y := float64(i)/(float64(slices)-1)*height - height/2
-		c.TranslateY(y)
-		shape.Add(c)
+		p.TranslateY(y)
+		shape.Segments = append(shape.Segments, s...)
+		shape.Points = append(shape.Points, p...)
 	}
 	return shape
 }
@@ -73,23 +83,31 @@ func Cylinder(height, radius float64, slices, res int) *Shape {
 }
 
 // GridPlane creates a 3d plane containing a grid.
-func GridPlane(w, d, res float64) *Shape {
-	shape := NewShape(0, false)
-	for x := -w / 2; x <= w/2; x += res {
-		path := NewPointList()
-		path.AddXYZ(x, 0, -d/2)
-		path.AddXYZ(x, 0, d/2)
-		shape.Add(path)
+func GridPlane(w, d float64, rows, cols int) *Shape {
+	shape := NewShape()
+	for x := 0.0; x <= float64(rows); x++ {
+		for z := 0.0; z <= float64(cols); z++ {
+			shape.Points = append(shape.Points, NewPoint(x, 0, z))
+		}
 	}
-	for z := -d / 2; z <= d/2; z += res {
-		path := NewPointList()
-		path.AddXYZ(-w/2, 0, z)
-		path.AddXYZ(w/2, 0, z)
-		shape.Add(path)
+	for x := 0; x <= rows; x++ {
+		for z := 0; z <= cols; z++ {
+			index := x + z*(rows+1)
+			if x < rows {
+				shape.AddSegmentByIndex(index, index+1)
+			}
+			if z < cols {
+				shape.AddSegmentByIndex(index, index+rows+1)
+			}
+		}
 	}
+	shape.Scale(w/float64(rows), 1, d/float64(cols))
+	shape.Translate(-w/2, 0, -d/2)
+
 	return shape
 }
 
+/*
 // Pyramid creates a 3d pyramid shape.
 func Pyramid(height, baseRadius float64, sides int) *Shape {
 	shape := &Shape{
@@ -112,24 +130,24 @@ func Pyramid(height, baseRadius float64, sides int) *Shape {
 	}
 	return shape
 }
+*/
 
 // Sphere creates a 3d sphere made of a number of slices.
 func Sphere(radius float64, slices, res int) *Shape {
-	shape := &Shape{
-		[]PointList{},
-		true,
-	}
+	shape := NewShape()
 	fslice := float64(slices)
 	for i := 0.0; i < fslice; i++ {
 		a := i / fslice * math.Pi
-		c := CirclePath(math.Sin(a), res)
-		c.TranslateY(math.Cos(a))
-		shape.Add(c)
+		p, s := CirclePath(math.Sin(a), res)
+		p.TranslateY(math.Cos(a))
+		shape.Points = append(shape.Points, p...)
+		shape.Segments = append(shape.Segments, s...)
 	}
 	shape.UniScale(radius)
 	return shape
 }
 
+/*
 // Torus creates a 3d torus made of a number of slices.
 func Torus(r1, r2 float64, slices, res int) *Shape {
 	shape := NewShape(0, true)
@@ -163,3 +181,4 @@ func TorusKnot(p, q, scale, res float64) *Shape {
 	}
 	return shape
 }
+*/
