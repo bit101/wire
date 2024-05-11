@@ -107,30 +107,27 @@ func GridPlane(w, d float64, rows, cols int) *Shape {
 	return shape
 }
 
-/*
 // Pyramid creates a 3d pyramid shape.
 func Pyramid(height, baseRadius float64, sides int) *Shape {
-	shape := &Shape{
-		[]PointList{},
-		true,
-	}
-	for i := 0; i < sides; i++ {
-		side := NewPointList()
-		a1 := float64(i) / float64(sides) * blmath.Tau
-		x := math.Cos(a1) * baseRadius
+	fsides := float64(sides)
+	shape := NewShape()
+	shape.AddXYZ(0, -height/2, 0)
+	for i := 0.0; i < fsides; i++ {
+		a := i / fsides * blmath.Tau
+		x := math.Cos(a) * baseRadius
 		y := height / 2
-		z := math.Sin(a1) * baseRadius
-		side.AddXYZ(x, y, z)
-		a2 := float64(i+1) / float64(sides) * blmath.Tau
-		x = math.Cos(a2) * baseRadius
-		z = math.Sin(a2) * baseRadius
-		side.AddXYZ(x, y, z)
-		side.AddXYZ(0, -height/2, 0)
-		shape.Add(side)
+		z := math.Sin(a) * baseRadius
+		shape.AddXYZ(x, y, z)
 	}
+	for i := 0; i < sides-1; i++ {
+		shape.AddSegmentByIndex(0, i+1)
+		shape.AddSegmentByIndex(i+1, i+2)
+	}
+	last := len(shape.Points) - 1
+	shape.AddSegmentByIndex(0, last)
+	shape.AddSegmentByIndex(last, 1)
 	return shape
 }
-*/
 
 // Sphere creates a 3d sphere made of a number of slices.
 func Sphere(radius float64, slices, res int) *Shape {
@@ -147,38 +144,38 @@ func Sphere(radius float64, slices, res int) *Shape {
 	return shape
 }
 
-/*
 // Torus creates a 3d torus made of a number of slices.
 func Torus(r1, r2 float64, slices, res int) *Shape {
-	shape := NewShape(0, true)
+	shape := NewShape()
 	fslice := float64(slices)
 	for i := 0.0; i < fslice; i++ {
 		angle := i / fslice * blmath.Tau
-		c := CirclePath(r2, res)
-		c.RotateX(math.Pi / 2)
-		c.TranslateX(r1)
-		c.RotateY(angle)
-		shape.Add(c)
+		p, s := CirclePath(r2, res)
+		p.RotateX(math.Pi / 2)
+		p.TranslateX(r1)
+		p.RotateY(angle)
+		shape.Points = append(shape.Points, p...)
+		shape.Segments = append(shape.Segments, s...)
 	}
 	return shape
 }
 
 // TorusKnot creates a 3d torus knot shape made of one long path that wraps around the torus.
-func TorusKnot(p, q, scale, res float64) *Shape {
-	shape := NewShape(1, false)
-	res = 1.0 / res
+func TorusKnot(p, q, r1, r2, res float64) *Shape {
+	shape := NewShape()
 	for t := 0.0; t < blmath.Tau; t += res {
-		r := math.Cos(q*t) + 3
+		r := math.Cos(q*t) + r1/r2
 		x := r * math.Cos(p*t)
-		y := r * math.Sin(p*t)
-		z := -math.Sin(q * t)
+		y := -math.Sin(q * t)
+		z := r * math.Sin(p*t)
 		shape.AddXYZ(
-			0,
-			x*scale,
-			y*scale,
-			z*scale,
+			x*r2,
+			y*r2,
+			z*r2,
 		)
+	}
+	for i := 0; i < len(shape.Points); i++ {
+		shape.AddSegmentByIndex(i, (i+1)%len(shape.Points))
 	}
 	return shape
 }
-*/
