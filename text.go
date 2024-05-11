@@ -1,6 +1,12 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
+import (
+	"math"
+	"strconv"
+	"strings"
+)
+
 const font_half_width = 50.0
 
 //////////////////////////////
@@ -30,7 +36,6 @@ type String struct {
 	Letters []*Shape
 }
 
-/*
 // NewString creates a new 3d string object.
 func NewString(str string, font FontType) *String {
 	str = strings.ToUpper(str)
@@ -54,37 +59,34 @@ func ParseChar(char string, font FontType) *Shape {
 	}
 	charData := fontData[char]
 	strokes := strings.Split(charData, ":")
-	shape := &Shape{
-		[]PointList{},
-		false,
-	}
+	shape := NewShape()
+	index := 0
 	for _, stroke := range strokes {
 		stroke = strings.TrimSpace(stroke)
 		coords := strings.Split(stroke, " ")
-		path := NewPointList()
-		for _, coord := range coords {
+		for i, coord := range coords {
 			xi, _ := strconv.ParseInt(string(coord[0]), 16, 64)
 			yi, _ := strconv.ParseInt(string(coord[1]), 16, 64)
 			x := float64(xi)/4.0 - 1.0
 			y := 1.0 - float64(yi)/4.0
-			path.AddXYZ(x, y, 0)
+			shape.AddXYZ(x, y, 0)
+			if i > 0 {
+				shape.AddSegmentByIndex(index-1, index)
+			}
+			index++
 		}
-		shape.Add(path)
 	}
 	shape.UniScale(font_half_width)
 	return shape
 }
-*/
 
-/*
 // AsCylinder creates a shape consisting of the string wrapped around a cylinder.
 func (s *String) AsCylinder(radius, spacing float64) *Shape {
-	shape := &Shape{
-		[]PointList{},
-		false,
-	}
+	shape := NewShape()
 	for _, pl := range s.Letters {
-		shape.Paths = append(shape.Paths, pl.TranslatedZ(-radius).Paths...)
+		pl.TranslateZ(-radius)
+		shape.Points = append(shape.Points, pl.Points...)
+		shape.Segments = append(shape.Segments, pl.Segments...)
 		shape.RotateY(math.Atan2(font_half_width+spacing, radius) * 2)
 	}
 	return shape
@@ -92,18 +94,15 @@ func (s *String) AsCylinder(radius, spacing float64) *Shape {
 
 // AsLine creates a shape consisting of the string laid out in a signle line.
 func (s *String) AsLine(spacing float64) *Shape {
-	shape := &Shape{
-		[]PointList{},
-		false,
-	}
+	shape := NewShape()
 	for _, pl := range s.Letters {
 		shape.TranslateX(-100 - spacing)
-		shape.Paths = append(shape.Paths, pl.Clone().Paths...)
+		shape.Points = append(shape.Points, pl.Points...)
+		shape.Segments = append(shape.Segments, pl.Segments...)
 	}
 	shape.TranslateX((font_half_width + spacing) * float64(len(s.Letters)))
 	return shape
 }
-*/
 
 //////////////////////////////
 // Font definitions

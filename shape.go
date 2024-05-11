@@ -47,7 +47,18 @@ func (s *Shape) AddXYZ(x, y, z float64) {
 	s.Points.AddXYZ(x, y, z)
 }
 
-// AddSegment adds a new segment based on the indexes of the two points passed.
+// AddSegment adds a new segment.
+func (s *Shape) AddSegment(seg *Segment) {
+	s.Segments = append(s.Segments, seg)
+}
+
+// AddSegmentByPoints adds a new segment based on the two points passed.
+func (s *Shape) AddSegmentByPoints(a, b *Point) {
+	seg := NewSegment(a, b)
+	s.Segments = append(s.Segments, seg)
+}
+
+// AddSegmentByIndex adds a new segment based on the indexes of the two points passed.
 func (s *Shape) AddSegmentByIndex(a, b int) {
 	seg := NewSegment(s.Points[a], s.Points[b])
 	s.Segments = append(s.Segments, seg)
