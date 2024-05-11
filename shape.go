@@ -2,8 +2,6 @@
 package wire
 
 import (
-	"log"
-
 	"github.com/bit101/bitlib/blcolor"
 	"github.com/bit101/bitlib/geom"
 )
@@ -27,117 +25,125 @@ type Context interface {
 
 // Shape is a 3d shape composed of multiple 3d paths.
 type Shape struct {
-	Paths  []PointList
-	Closed bool
+	Points   PointList
+	Segments []*Segment
 }
 
 // NewShape creates a new shape.
-func NewShape(numPaths int, closed bool) *Shape {
+func NewShape() *Shape {
 	return &Shape{
-		make([]PointList, numPaths),
-		closed,
+		PointList{},
+		[]*Segment{},
 	}
-}
-
-// Add adds a new path to the shape.
-func (s *Shape) Add(path PointList) {
-	s.Paths = append(s.Paths, path)
 }
 
 // AddPoint adds a point to the shape at the given path index.
-func (s *Shape) AddPoint(index int, point *Point) {
-	if index >= len(s.Paths) || index < 0 {
-		log.Fatal("list index must be from 0 to one less than the size of the list")
-	}
-	s.Paths[index].Add(point)
+func (s *Shape) AddPoint(point *Point) {
+	s.Points.Add(point)
 }
 
 // AddXYZ adds a point to the shape at the given path index.
-func (s *Shape) AddXYZ(index int, x, y, z float64) {
-	if index >= len(s.Paths) || index < 0 {
-		log.Fatal("list index must be from 0 to one less than the size of the list")
-	}
-	s.Paths[index].AddXYZ(x, y, z)
+func (s *Shape) AddXYZ(x, y, z float64) {
+	s.Points.AddXYZ(x, y, z)
+}
+
+// AddSegment adds a new segment based on the indexes of the two points passed.
+func (s *Shape) AddSegmentByIndex(a, b int) {
+	seg := NewSegment(s.Points[a], s.Points[b])
+	s.Segments = append(s.Segments, seg)
 }
 
 // AddRandomPointInBox creates and adds a new 3d point within a 3d box of the given dimensions.
 // The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
-func (s *Shape) AddRandomPointInBox(index int, w, h, d float64) {
-	s.AddPoint(index, RandomPointInBox(w, h, d))
+func (s *Shape) AddRandomPointInBox(w, h, d float64) {
+	s.AddPoint(RandomPointInBox(w, h, d))
 }
 
 // AddRandomPointOnSphere creates and adds a random 3d point ON a sphere of the given radius.
-func (s *Shape) AddRandomPointOnSphere(index int, radius float64) {
-	s.AddPoint(index, RandomPointOnSphere(radius))
+func (s *Shape) AddRandomPointOnSphere(radius float64) {
+	s.AddPoint(RandomPointOnSphere(radius))
 }
 
 // AddRandomPointInSphere creates and adds a random 3d point IN a sphere of the given radius.
-func (s *Shape) AddRandomPointInSphere(index int, radius float64) {
-	s.AddPoint(index, RandomPointInSphere(radius))
+func (s *Shape) AddRandomPointInSphere(radius float64) {
+	s.AddPoint(RandomPointInSphere(radius))
 }
 
 // AddRandomPointOnCylinder creates and adds a random 3d point ON a cylinder of the given radius and height.
-func (s *Shape) AddRandomPointOnCylinder(index int, height, radius float64) {
-	s.AddPoint(index, RandomPointOnCylinder(height, radius))
+func (s *Shape) AddRandomPointOnCylinder(height, radius float64) {
+	s.AddPoint(RandomPointOnCylinder(height, radius))
 }
 
 // AddRandomPointInCylinder creates and adds a random 3d point IN a cylinder of the given radius and height.
-func (s *Shape) AddRandomPointInCylinder(index int, height, radius float64) {
-	s.AddPoint(index, RandomPointInCylinder(height, radius))
+func (s *Shape) AddRandomPointInCylinder(height, radius float64) {
+	s.AddPoint(RandomPointInCylinder(height, radius))
 }
 
 // AddRandomPointOnTorus creates and adds a random 3d point ON a torus.
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
-func (s *Shape) AddRandomPointOnTorus(index int, radius1, radius2 float64) {
-	s.AddPoint(index, RandomPointOnTorus(radius1, radius2))
+func (s *Shape) AddRandomPointOnTorus(radius1, radius2 float64) {
+	s.AddPoint(RandomPointOnTorus(radius1, radius2))
 }
 
 // AddRandomPointInTorus creates and adds a random 3d point IN a torus.
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
-func (s *Shape) AddRandomPointInTorus(index int, radius1, radius2 float64) {
-	s.AddPoint(index, RandomPointInTorus(radius1, radius2))
+func (s *Shape) AddRandomPointInTorus(radius1, radius2 float64) {
+	s.AddPoint(RandomPointInTorus(radius1, radius2))
 }
 
 // Clone returns a deep copy of this shape.
 func (s *Shape) Clone() *Shape {
-	clone := NewShape(0, s.Closed)
-	for _, pointList := range s.Paths {
-		clone.Paths = append(clone.Paths, pointList.Clone())
+	clone := NewShape()
+	clone.Points = s.Points.Clone()
+	clone.Segments = []*Segment{}
+	for i := 0; i < len(s.Segments)-1; i++ {
+		clone.Segments = append(clone.Segments, s.Segments[i].Clone())
 	}
 	return clone
 }
 
 // Stroke strokes each path in a shape.
 func (s *Shape) Stroke(context Context) {
-	for _, path := range s.Paths {
-		path.Stroke(context, s.Closed)
+	s.Points.Project()
+	for _, segment := range s.Segments {
+		segment.Stroke(context)
 	}
 }
 
-// Points draws a filled circle for each point in the path.
-func (s *Shape) Points(context Context, radius float64) {
-	for _, path := range s.Paths {
-		path.Points(context, radius)
-	}
+// RenderPoints draws a filled circle for each point in the path.
+func (s *Shape) RenderPoints(context Context, radius float64) {
+	s.Points.Project()
+	s.Points.RenderPoints(context, radius)
 }
 
 // Subdivide puts a new point between each pair of points.
 func (s *Shape) Subdivide(times int) {
-	for i := 0; i < len(s.Paths); i++ {
-		s.Paths[i].Subdivide(times)
+	for range times {
+		for _, seg := range s.Segments {
+			a := seg.PointA
+			b := seg.PointB
+			x := (a.X + b.X) / 2
+			y := (a.Y + b.Y) / 2
+			z := (a.Z + b.Z) / 2
+			p := NewPoint(x, y, z)
+			s.AddPoint(p)
+			seg.PointB = p
+			newSeg := NewSegment(p, b)
+			s.Segments = append(s.Segments, newSeg)
+		}
 	}
 }
 
 // Cull removes points from the shape that do not satisfy the cull function. Modifies shape in place.
+// TODO: cull segments not just points
 func (s *Shape) Cull(cullFunc func(*Point) bool) {
-	for i := 0; i < len(s.Paths); i++ {
-		s.Paths[i].Cull(cullFunc)
-	}
+	s.Points.Cull(cullFunc)
 }
 
 // Culled returns a new shape with points removed that do not satisfy the cull function.
+// TODO: cull segments not just points
 func (s *Shape) Culled(cullFunc func(*Point) bool) *Shape {
 	s1 := s.Clone()
 	s1.Cull(cullFunc)
@@ -145,10 +151,9 @@ func (s *Shape) Culled(cullFunc func(*Point) bool) *Shape {
 }
 
 // CullBox removes points that ar not within the defined box. Modifies the shape in place.
+// TODO: cull segments not just points
 func (s *Shape) CullBox(minX, minY, minZ, maxX, maxY, maxZ float64) {
-	for i := 0; i < len(s.Paths); i++ {
-		s.Paths[i].CullBox(minX, minY, minZ, maxX, maxY, maxZ)
-	}
+	s.Points.CullBox(minX, minY, minZ, maxX, maxY, maxZ)
 }
 
 //////////////////////////////
@@ -157,121 +162,87 @@ func (s *Shape) CullBox(minX, minY, minZ, maxX, maxY, maxZ float64) {
 
 // TranslateX translates this shape on the x-axis, in place.
 func (s *Shape) TranslateX(tx float64) {
-	for _, path := range s.Paths {
-		path.TranslateX(tx)
-	}
+	s.Points.TranslateX(tx)
 }
 
 // TranslateY translates this shape on the y-axis, in place.
 func (s *Shape) TranslateY(ty float64) {
-	for _, path := range s.Paths {
-		path.TranslateY(ty)
-	}
+	s.Points.TranslateY(ty)
 }
 
 // TranslateZ translates this shape on the z-axis, in place.
 func (s *Shape) TranslateZ(tz float64) {
-	for _, path := range s.Paths {
-		path.TranslateZ(tz)
-	}
+	s.Points.TranslateZ(tz)
 }
 
 // Translate translates this shape on all axes, in place.
 func (s *Shape) Translate(tx, ty, tz float64) {
-	for _, list := range s.Paths {
-		list.Translate(tx, ty, tz)
-	}
+	s.Points.Translate(tx, ty, tz)
 }
 
 // RotateX rotates this shape around the x-axis, in place.
 func (s *Shape) RotateX(angle float64) {
-	for _, list := range s.Paths {
-		list.RotateX(angle)
-	}
+	s.Points.RotateX(angle)
 }
 
 // RotateY rotates this shape around the y-axis, in place.
 func (s *Shape) RotateY(angle float64) {
-	for _, list := range s.Paths {
-		list.RotateY(angle)
-	}
+	s.Points.RotateY(angle)
 }
 
 // RotateZ rotates this shape around the z-axis, in place.
 func (s *Shape) RotateZ(angle float64) {
-	for _, list := range s.Paths {
-		list.RotateZ(angle)
-	}
+	s.Points.RotateZ(angle)
 }
 
 // Rotate rotates this shape around all axes, in place.
 func (s *Shape) Rotate(rx, ry, rz float64) {
-	for _, list := range s.Paths {
-		list.Rotate(rx, ry, rz)
-	}
+	s.Points.Rotate(rx, ry, rz)
 }
 
 // ScaleX scales this shape on the x-axis, in place.
 func (s *Shape) ScaleX(scale float64) {
-	for _, path := range s.Paths {
-		path.ScaleX(scale)
-	}
+	s.Points.ScaleX(scale)
 }
 
 // ScaleY scales this shape on the y-axis, in place.
 func (s *Shape) ScaleY(scale float64) {
-	for _, path := range s.Paths {
-		path.ScaleY(scale)
-	}
+	s.Points.ScaleY(scale)
 }
 
 // ScaleZ scales this shape on the z-axis, in place.
 func (s *Shape) ScaleZ(scale float64) {
-	for _, path := range s.Paths {
-		path.ScaleZ(scale)
-	}
+	s.Points.ScaleZ(scale)
 }
 
 // Scale scales this shape on all axes, in place.
 func (s *Shape) Scale(sx, sy, sz float64) {
-	for _, list := range s.Paths {
-		list.Scale(sx, sy, sz)
-	}
+	s.Points.Scale(sx, sy, sz)
 }
 
 // UniScale scales this shape by the same amount on each axis, in place.
 func (s *Shape) UniScale(scale float64) {
-	for _, list := range s.Paths {
-		list.UniScale(scale)
-	}
+	s.Points.UniScale(scale)
 }
 
 // RandomizeX randomizes this shape on the x-axis, in place.
 func (s *Shape) RandomizeX(amount float64) {
-	for _, list := range s.Paths {
-		list.RandomizeX(amount)
-	}
+	s.Points.RandomizeX(amount)
 }
 
 // RandomizeY randomizes this shape on the y-axis, in place.
 func (s *Shape) RandomizeY(amount float64) {
-	for _, list := range s.Paths {
-		list.RandomizeY(amount)
-	}
+	s.Points.RandomizeY(amount)
 }
 
 // RandomizeZ randmizes this shape on the z-axis, in place.
 func (s *Shape) RandomizeZ(amount float64) {
-	for _, list := range s.Paths {
-		list.RandomizeZ(amount)
-	}
+	s.Points.RandomizeZ(amount)
 }
 
 // Randomize randomizes this shape on all axes, in place.
 func (s *Shape) Randomize(amount float64) {
-	for _, list := range s.Paths {
-		list.Randomize(amount)
-	}
+	s.Points.Randomize(amount)
 }
 
 //////////////////////////////

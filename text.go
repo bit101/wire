@@ -1,12 +1,6 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
-import (
-	"math"
-	"strconv"
-	"strings"
-)
-
 const font_half_width = 50.0
 
 //////////////////////////////
@@ -36,6 +30,7 @@ type String struct {
 	Letters []*Shape
 }
 
+/*
 // NewString creates a new 3d string object.
 func NewString(str string, font FontType) *String {
 	str = strings.ToUpper(str)
@@ -79,7 +74,9 @@ func ParseChar(char string, font FontType) *Shape {
 	shape.UniScale(font_half_width)
 	return shape
 }
+*/
 
+/*
 // AsCylinder creates a shape consisting of the string wrapped around a cylinder.
 func (s *String) AsCylinder(radius, spacing float64) *Shape {
 	shape := &Shape{
@@ -106,6 +103,7 @@ func (s *String) AsLine(spacing float64) *Shape {
 	shape.TranslateX((font_half_width + spacing) * float64(len(s.Letters)))
 	return shape
 }
+*/
 
 //////////////////////////////
 // Font definitions
