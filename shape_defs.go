@@ -54,7 +54,7 @@ func CirclePath(radius float64, res int) (PointList, []*Segment) {
 	return points, segments
 }
 
-// Circle creates a 3d cone shape made of a number of slices.
+// Circle creates a 3d cone shape made of a number of circular slices.
 func Circle(radius float64, res int) *Shape {
 	shape := NewShape()
 	p, s := CirclePath(radius, res)
@@ -63,7 +63,7 @@ func Circle(radius float64, res int) *Shape {
 	return shape
 }
 
-// Cone creates a 3d cone shape made of a number of slices.
+// Cone creates a 3d cone shape made of a number of circular slices.
 func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
 	shape := NewShape()
 	for i := 0; i < slices; i++ {
@@ -77,7 +77,7 @@ func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
 	return shape
 }
 
-// Cylinder creates a 3d cylinder shape made of a number of slices.
+// Cylinder creates a 3d cylinder shape made of a number of circular slices.
 func Cylinder(height, radius float64, slices, res int) *Shape {
 	return Cone(height, radius, radius, slices, res)
 }
@@ -129,7 +129,25 @@ func Pyramid(height, baseRadius float64, sides int) *Shape {
 	return shape
 }
 
-// Sphere creates a 3d sphere made of a number of slices.
+// RandomInnerSphere creates a 3d sphere made of random points inside the sphere.
+func RandomInnerSphere(radius float64, count int) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddRandomPointInSphere(radius)
+	}
+	return shape
+}
+
+// RandomSurfaceSphere creates a 3d sphere made of random points on the surface of the sphere.
+func RandomSurfaceSphere(radius float64, count int) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddRandomPointOnSphere(radius)
+	}
+	return shape
+}
+
+// Sphere creates a 3d sphere of regular points that can be connected longitudinally, lattitudally, or both.
 func Sphere(radius float64, long, lat int, showLong, showLat bool) *Shape {
 	shape := NewShape()
 	fslice := float64(long)
@@ -153,7 +171,7 @@ func Sphere(radius float64, long, lat int, showLong, showLat bool) *Shape {
 	return shape
 }
 
-// Torus creates a 3d torus made of a number of slices.
+// Torus creates a 3d torus made of a number of circular slices.
 func Torus(r1, r2 float64, slices, res int) *Shape {
 	shape := NewShape()
 	fslice := float64(slices)
