@@ -4,7 +4,7 @@ package wire
 import (
 	"math"
 
-	"github.com/bit101/bitlib/blcolor"
+	"github.com/bit101/bitlib/blmath"
 	"github.com/bit101/bitlib/random"
 )
 
@@ -12,12 +12,20 @@ import (
 type Point struct {
 	X, Y, Z         float64
 	Px, Py, Scaling float64
-	color           *blcolor.Color
 }
 
 // NewPoint creates a new 3d point.
 func NewPoint(x, y, z float64) *Point {
-	return &Point{x, y, z, 0, 0, 0, nil}
+	return &Point{x, y, z, 0, 0, 0}
+}
+
+// LerpPoint creates a new 3d point interpolated from the two given points.
+func LerpPoint(t float64, p0, p1 *Point) *Point {
+	return NewPoint(
+		blmath.Lerp(t, p0.X, p1.X),
+		blmath.Lerp(t, p0.Y, p1.Y),
+		blmath.Lerp(t, p0.Z, p1.Z),
+	)
 }
 
 // RandomPointInBox creates a new 3d point within a 3d box of the given dimensions.
@@ -31,7 +39,7 @@ func RandomPointInBox(w, h, d float64) *Point {
 }
 
 // RandomPointOnSphere creates a random 3d point ON a sphere of the given radius.
-// https://app.wallabag.it/view/18373497
+// https://mathworld.wolfram.com/SpherePointPicking.html
 func RandomPointOnSphere(radius float64) *Point {
 	u := random.FloatRange(-1, 1)
 	t := random.Angle()
@@ -42,7 +50,8 @@ func RandomPointOnSphere(radius float64) *Point {
 }
 
 // RandomPointInSphere creates a random 3d point IN a sphere of the given radius.
-// https://app.wallabag.it/view/18373497
+// https://mathworld.wolfram.com/SpherePointPicking.html
+// Main change from the on-surface version is radius is randomized.
 func RandomPointInSphere(radius float64) *Point {
 	u := random.FloatRange(-1, 1)
 	t := random.Angle()
@@ -101,17 +110,7 @@ func RandomPointInTorus(radius1, radius2 float64) *Point {
 
 // Clone returns a copy of this point.
 func (p *Point) Clone() *Point {
-	return &Point{p.X, p.Y, p.Z, p.Px, p.Py, p.Scaling, nil}
-}
-
-// SetColor sets the color of this point.
-func (p *Point) SetColor(color blcolor.Color) {
-	p.color = &color
-}
-
-// UnsetColor removes the custom color. Any drawing will use the active context source color.
-func (p *Point) UnsetColor() {
-	p.color = nil
+	return &Point{p.X, p.Y, p.Z, p.Px, p.Py, p.Scaling}
 }
 
 // Project projects this 3d point to a 2d point, by setting the Px, Py and Scaling properties of this point.
@@ -128,6 +127,17 @@ func (p *Point) Distance(other *Point) float64 {
 	dy := other.Y - p.Y
 	dz := other.Z - p.Z
 	return math.Sqrt(dx*dx + dy*dy + dz*dz)
+}
+
+// Visible returns whether or not a point should be visible.
+func (p *Point) Visible() bool {
+	if p.Z+World.CZ < World.NearZ {
+		return false
+	}
+	if p.Z+World.CZ > World.FarZ {
+		return false
+	}
+	return true
 }
 
 //////////////////////////////

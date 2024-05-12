@@ -1,7 +1,11 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
-import "slices"
+import (
+	"slices"
+
+	"github.com/bit101/bitlib/blcolor"
+)
 
 // PointList represents a list of 3d points.
 type PointList []*Point
@@ -78,47 +82,8 @@ func (p PointList) Project() {
 	}
 }
 
-func shouldDraw(p0, p1 *Point) bool {
-	return Visible(p0) && Visible(p1)
-}
-
-// Stroke strokes a path on a point list.
-// It first projects the 3d points to 2d points, then draws each segment between points,
-// ignoring segments that fall outside the near and far bounds.
-func (p PointList) Stroke(context Context, closed bool) {
-	p.Project()
-	lineWidth := context.GetLineWidth()
-	for i := 0; i < len(p)-1; i++ {
-		scale := 1.0
-		p0 := p[i]
-		p1 := p[i+1]
-		if World.ScaleLineWidth {
-			scale = (p0.Scaling + p1.Scaling) / 2
-		}
-		if shouldDraw(p0, p1) {
-			context.SetLineWidth(lineWidth * scale)
-			context.MoveTo(p0.Px, p0.Py)
-			context.LineTo(p1.Px, p1.Py)
-			context.Stroke()
-		}
-	}
-	p0 := p.First()
-	p1 := p.Last()
-	if closed && shouldDraw(p0, p1) {
-		scale := 1.0
-		if World.ScaleLineWidth {
-			scale = (p0.Scaling + p1.Scaling) / 2
-		}
-		context.SetLineWidth(lineWidth * scale)
-		context.MoveTo(p0.Px, p0.Py)
-		context.LineTo(p1.Px, p1.Py)
-		context.Stroke()
-	}
-	context.SetLineWidth(lineWidth)
-}
-
-// RenderPoints draws a circle for each point in the list.
-func (p PointList) RenderPoints(context Context, radius float64) {
+// RenderPoints projects and draws a circle for each point in the list.
+func (p PointList) RenderPoints(radius float64) {
 	p.Project()
 	slices.SortFunc(p, func(a, b *Point) int {
 		if a.Z > b.Z {
@@ -127,13 +92,13 @@ func (p PointList) RenderPoints(context Context, radius float64) {
 		return 1
 	})
 	for _, point := range p {
-		if Visible(point) {
-			context.Save()
-			if point.color != nil {
-				context.SetSourceColor(*point.color)
-			}
-			context.FillCircle(point.Px, point.Py, radius*point.Scaling)
-			context.Restore()
+		if point.Visible() {
+			World.Context.Save()
+			fog := FogAmount(point.Z)
+			color := blcolor.RGBA(World.R, World.G, World.B, fog)
+			World.Context.SetSourceColor(color)
+			World.Context.FillCircle(point.Px, point.Py, radius*point.Scaling)
+			World.Context.Restore()
 		}
 	}
 }
@@ -155,24 +120,6 @@ func (p PointList) First() *Point {
 func (p PointList) Last() *Point {
 	return p[len(p)-1]
 }
-
-/*
-// Subdivide creates a new point between each pair of points in the list.
-// It will iterate `times` number of iterations, so the number of resulting points will go up fast.
-func (p *PointList) Subdivide(times int) {
-	for t := 0; t < times; t++ {
-		newList := NewPointList()
-		for i := 0; i < len(*p)-1; i++ {
-			p0 := (*p)[i]
-			p1 := (*p)[i+1]
-			newList.Add(p0.Clone())
-			newList.AddXYZ((p0.X+p1.X)/2, (p0.Y+p1.Y)/2, (p0.Z+p1.Z)/2)
-		}
-		newList.Add(p.Last().Clone())
-		*p = newList
-	}
-}
-*/
 
 // Cull removes points from the list that do not satisfy the cull function. Modifies list in place.
 func (p *PointList) Cull(cullFunc func(*Point) bool) {

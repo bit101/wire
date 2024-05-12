@@ -2,28 +2,10 @@
 package wire
 
 import (
-	"github.com/bit101/bitlib/blcolor"
-	"github.com/bit101/bitlib/geom"
+	"slices"
 )
 
-// Context interface to allow for drawing functions.
-// The interface defines only the used methods of cairo.Context.
-// This is needed to avoid recursive dependencies between wire and cairo.
-type Context interface {
-	StrokePath(geom.PointList, bool)
-	FillCircle(float64, float64, float64)
-	MoveTo(float64, float64)
-	LineTo(float64, float64)
-	Stroke()
-	ClosePath()
-	SetLineWidth(float64)
-	GetLineWidth() float64
-	Save()
-	Restore()
-	SetSourceColor(blcolor.Color)
-}
-
-// Shape is a 3d shape composed of multiple 3d paths.
+// Shape is a 3d shape composed of a list of points and segments connecting them.
 type Shape struct {
 	Points   PointList
 	Segments []*Segment
@@ -37,12 +19,12 @@ func NewShape() *Shape {
 	}
 }
 
-// AddPoint adds a point to the shape at the given path index.
+// AddPoint adds a point to the shape.
 func (s *Shape) AddPoint(point *Point) {
 	s.Points.Add(point)
 }
 
-// AddXYZ adds a point to the shape at the given path index.
+// AddXYZ adds a point to the shape.
 func (s *Shape) AddXYZ(x, y, z float64) {
 	s.Points.AddXYZ(x, y, z)
 }
@@ -108,25 +90,26 @@ func (s *Shape) AddRandomPointInTorus(radius1, radius2 float64) {
 func (s *Shape) Clone() *Shape {
 	clone := NewShape()
 	clone.Points = s.Points.Clone()
-	clone.Segments = []*Segment{}
-	for i := 0; i < len(s.Segments)-1; i++ {
-		clone.Segments = append(clone.Segments, s.Segments[i].Clone())
+	for _, seg := range s.Segments {
+		indexA := slices.Index(s.Points, seg.PointA)
+		indexB := slices.Index(s.Points, seg.PointB)
+		clone.AddSegmentByIndex(indexA, indexB)
 	}
 	return clone
 }
 
 // Stroke strokes each path in a shape.
-func (s *Shape) Stroke(context Context) {
+func (s *Shape) Stroke() {
 	s.Points.Project()
 	for _, segment := range s.Segments {
-		segment.Stroke(context)
+		segment.Stroke()
 	}
 }
 
 // RenderPoints draws a filled circle for each point in the path.
-func (s *Shape) RenderPoints(context Context, radius float64) {
+func (s *Shape) RenderPoints(radius float64) {
 	s.Points.Project()
-	s.Points.RenderPoints(context, radius)
+	s.Points.RenderPoints(radius)
 }
 
 // Subdivide puts a new point between each pair of points.

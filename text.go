@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const font_half_width = 50.0
+const fontHalfWidth = 50.0
 
 //////////////////////////////
 // Font data
@@ -76,23 +76,23 @@ func ParseChar(char string, font FontType) *Shape {
 			index++
 		}
 	}
-	shape.UniScale(font_half_width)
+	shape.UniScale(fontHalfWidth)
 	return shape
 }
 
-// AsCylinder creates a shape consisting of the string wrapped around a cylinder.
+// AsCylinder creates a single shape consisting of the all the chars in the string wrapped around a cylinder.
 func (s *String) AsCylinder(radius, spacing float64) *Shape {
 	shape := NewShape()
 	for _, pl := range s.Letters {
 		pl.TranslateZ(-radius)
 		shape.Points = append(shape.Points, pl.Points...)
 		shape.Segments = append(shape.Segments, pl.Segments...)
-		shape.RotateY(math.Atan2(font_half_width+spacing, radius) * 2)
+		shape.RotateY(math.Atan2(fontHalfWidth+spacing, radius) * 2)
 	}
 	return shape
 }
 
-// AsLine creates a shape consisting of the string laid out in a signle line.
+// AsLine creates a single shape consisting of all the chars in the string laid out in a signle line.
 func (s *String) AsLine(spacing float64) *Shape {
 	shape := NewShape()
 	for _, pl := range s.Letters {
@@ -100,7 +100,7 @@ func (s *String) AsLine(spacing float64) *Shape {
 		shape.Points = append(shape.Points, pl.Points...)
 		shape.Segments = append(shape.Segments, pl.Segments...)
 	}
-	shape.TranslateX((font_half_width + spacing) * float64(len(s.Letters)))
+	shape.TranslateX((fontHalfWidth + spacing) * float64(len(s.Letters)))
 	return shape
 }
 
