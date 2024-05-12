@@ -2,8 +2,6 @@
 package wire
 
 import (
-	"slices"
-
 	"github.com/bit101/bitlib/blcolor"
 )
 
@@ -85,12 +83,6 @@ func (p PointList) Project() {
 // RenderPoints projects and draws a circle for each point in the list.
 func (p PointList) RenderPoints(radius float64) {
 	p.Project()
-	slices.SortFunc(p, func(a, b *Point) int {
-		if a.Z > b.Z {
-			return -1
-		}
-		return 1
-	})
 	for _, point := range p {
 		if point.Visible() {
 			World.Context.Save()
