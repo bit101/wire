@@ -1,10 +1,6 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
-import (
-	"github.com/bit101/bitlib/blcolor"
-)
-
 // PointList represents a list of 3d points.
 type PointList []*Point
 
@@ -85,12 +81,10 @@ func (p PointList) RenderPoints(radius float64) {
 	p.Project()
 	for _, point := range p {
 		if point.Visible() {
-			World.Context.Save()
-			fog := FogAmount(point.Z)
-			color := blcolor.RGBA(World.R, World.G, World.B, fog)
-			World.Context.SetSourceColor(color)
-			World.Context.FillCircle(point.Px, point.Py, radius*point.Scaling)
-			World.Context.Restore()
+			world.Context.Save()
+			ApplyFog(point.Z)
+			world.Context.FillCircle(point.Px, point.Py, radius*point.Scaling)
+			world.Context.Restore()
 		}
 	}
 }

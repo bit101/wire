@@ -115,9 +115,9 @@ func (p *Point) Clone() *Point {
 
 // Project projects this 3d point to a 2d point, by setting the Px, Py and Scaling properties of this point.
 func (p *Point) Project() {
-	scale := World.FL / (World.CZ + p.Z)
-	p.Px = World.CX + p.X*scale
-	p.Py = World.CY + p.Y*scale
+	scale := world.FL / (world.CZ + p.Z)
+	p.Px = world.CX + p.X*scale
+	p.Py = world.CY + p.Y*scale
 	p.Scaling = scale
 }
 
@@ -131,10 +131,10 @@ func (p *Point) Distance(other *Point) float64 {
 
 // Visible returns whether or not a point should be visible.
 func (p *Point) Visible() bool {
-	if p.Z+World.CZ < World.NearZ {
+	if p.Z+world.CZ < world.NearZ {
 		return false
 	}
-	if p.Z+World.CZ > World.FarZ {
+	if p.Z+world.CZ > world.FarZ {
 		return false
 	}
 	return true

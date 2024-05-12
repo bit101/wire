@@ -29,7 +29,7 @@ type worldDef struct {
 	FL          float64
 	CX, CY, CZ  float64
 	NearZ, FarZ float64
-	Fog         bool
+	FogActive   bool
 	NearFog     float64
 	FarFog      float64
 	R, G, B     float64
@@ -37,43 +37,71 @@ type worldDef struct {
 }
 
 // World contains the parameters for the 3d world.
-var World = worldDef{
-	FL:      300.0,
-	CX:      0.0,
-	CY:      0.0,
-	CZ:      0.0,
-	NearZ:   100.0,
-	FarZ:    100000.0,
-	Fog:     false,
-	NearFog: 400.0,
-	FarFog:  1200.0,
-	R:       1,
-	G:       1,
-	B:       1,
-	Context: nil,
+var world = worldDef{
+	FL:        300.0,
+	CX:        0.0,
+	CY:        0.0,
+	CZ:        0.0,
+	NearZ:     100.0,
+	FarZ:      100000.0,
+	FogActive: false,
+	NearFog:   400.0,
+	FarFog:    1200.0,
+	R:         1,
+	G:         1,
+	B:         1,
+	Context:   nil,
 }
 
 // InitWorld initializes the world.
 func InitWorld(context Context, cx, cy, cz float64) {
-	World.Context = context
+	world.Context = context
 	SetRGB(context.GetSourceRGB())
-	World.CX = cx
-	World.CY = cy
-	World.CZ = cz
+	SetCenter(cx, cy, cz)
+}
+
+// GetRGB returns the current drawing color.
+func GetRGB() (float64, float64, float64) {
+	return world.R, world.G, world.B
 }
 
 // SetRGB sets the drawing color.
 func SetRGB(r, g, b float64) {
-	World.R = r
-	World.G = g
-	World.B = b
+	world.R = r
+	world.G = g
+	world.B = b
 }
 
-// FogAmount returns the amount of fog to apply for the given object z.
-func FogAmount(objectZ float64) float64 {
-	if !World.Fog {
-		return 1.0
+// SetPerspective sets the amount of perspective to apply.
+func SetPerspective(fl float64) {
+	world.FL = fl
+}
+
+// SetCenter sets the center of the 3d world.
+func SetCenter(x, y, z float64) {
+	world.CX, world.CY, world.CZ = x, y, z
+}
+
+// SetClipping sets the near and far limits of rendering.
+func SetClipping(near, far float64) {
+	world.NearZ = near
+	world.FarZ = far
+}
+
+// ApplyFog returns the amount of fog to apply for the given object z.
+func ApplyFog(objectZ float64) {
+	fog := 1.0
+	if world.FogActive {
+		fog = blmath.Map(objectZ+world.CZ, world.NearFog, world.FarFog, 1, 0)
+		fog = blmath.Clamp(fog, 0, 1)
 	}
-	f := blmath.Map(objectZ+World.CZ, World.NearFog, World.FarFog, 1, 0)
-	return blmath.Clamp(f, 0, 1)
+	color := blcolor.RGBA(world.R, world.G, world.B, fog)
+	world.Context.SetSourceColor(color)
+}
+
+// SetFog sets the fog parameters, including turning on and off.
+func SetFog(active bool, near, far float64) {
+	world.FogActive = active
+	world.NearFog = near
+	world.FarFog = far
 }
