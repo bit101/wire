@@ -261,17 +261,18 @@ func (p PointList) Randomize(amount float64) {
 	}
 }
 
-func (p PointList) Pull(puller *Point, radius float64) {
+// Push pushes points away from the specified point.
+func (p PointList) Push(pusher *Point, radius float64) {
 	for _, point := range p {
-		dist := point.Distance(puller)
+		dist := point.Distance(pusher)
 		if dist < radius {
-			point.X -= puller.X
-			point.Y -= puller.Y
-			point.Z -= puller.Z
+			point.X -= pusher.X
+			point.Y -= pusher.Y
+			point.Z -= pusher.Z
 			point.UniScale(radius / dist)
-			point.X += puller.X
-			point.Y += puller.Y
-			point.Z += puller.Z
+			point.X += pusher.X
+			point.Y += pusher.Y
+			point.Z += pusher.Z
 		}
 
 	}
