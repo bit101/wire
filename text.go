@@ -95,12 +95,13 @@ func (s *String) AsCylinder(radius, spacing float64) *Shape {
 // AsLine creates a single shape consisting of all the chars in the string laid out in a signle line.
 func (s *String) AsLine(spacing float64) *Shape {
 	shape := NewShape()
-	for _, pl := range s.Letters {
-		shape.TranslateX(-100 - spacing)
+	for i, pl := range s.Letters {
+		pl.TranslateX(50 + (100+spacing)*float64(i))
 		shape.Points = append(shape.Points, pl.Points...)
 		shape.Segments = append(shape.Segments, pl.Segments...)
 	}
-	shape.TranslateX((fontHalfWidth + spacing) * float64(len(s.Letters)))
+	mult := float64(len(s.Letters))
+	shape.TranslateX(-(fontHalfWidth*2+spacing)*mult/2 + spacing)
 	return shape
 }
 

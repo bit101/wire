@@ -62,6 +62,19 @@ func RandomPointInSphere(radius float64) *Point {
 	return NewPoint(x*radius, y*radius, z*radius)
 }
 
+// RandomPointInCircle returns a random 3d point in a circle. The y-coordinate will be 0.
+func RandomPointInCircle(radius float64) *Point {
+	r := math.Sqrt(random.Float()) * radius
+	a := random.Angle()
+	return NewPoint(math.Cos(a)*r, 0, math.Sin(a)*r)
+}
+
+// RandomPointInRectangle returns a random 3d point in a rectangle.
+// The rectangle will be centered at the origin, with the y-coordinate at 0.
+func RandomPointInRectangle(w, d float64) *Point {
+	return NewPoint(random.FloatRange(-w/2, w/2), 0, random.FloatRange(-d/2, d/2))
+}
+
 // RandomPointOnCylinder creates a random 3d point ON a cylinder of the given radius and height.
 func RandomPointOnCylinder(height, radius float64) *Point {
 	angle := random.Angle()
