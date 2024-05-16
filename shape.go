@@ -82,8 +82,8 @@ func (s *Shape) AddRandomPointOnTorus(radius1, radius2 float64) {
 // AddRandomPointInTorus creates and adds a random 3d point IN a torus.
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
-func (s *Shape) AddRandomPointInTorus(radius1, radius2 float64) {
-	s.AddPoint(RandomPointInTorus(radius1, radius2))
+func (s *Shape) AddRandomPointInTorus(radius1, radius2, arc float64) {
+	s.AddPoint(RandomPointInTorus(radius1, radius2, arc))
 }
 
 // Clone returns a deep copy of this shape.

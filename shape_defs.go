@@ -64,22 +64,33 @@ func Circle(radius float64, res int) *Shape {
 }
 
 // Cone creates a 3d cone shape made of a number of circular slices.
-func Cone(height, radius0, radius1 float64, slices, res int) *Shape {
+func Cone(height, radius0, radius1 float64, slices, res int, showSlices, showLong bool) *Shape {
 	shape := NewShape()
 	for i := 0; i < slices; i++ {
 		radius := blmath.Map(float64(i), 0, float64(slices-1), radius0, radius1)
 		p, s := CirclePath(radius, res)
 		y := float64(i)/(float64(slices)-1)*height - height/2
 		p.TranslateY(y)
-		shape.Segments = append(shape.Segments, s...)
+		if showSlices {
+			shape.Segments = append(shape.Segments, s...)
+		}
 		shape.Points = append(shape.Points, p...)
+	}
+	if showLong {
+		for i := range slices - 1 {
+			for j := range res {
+				index0 := i*res + j
+				index1 := (i+1)*res + j
+				shape.AddSegmentByIndex(index0, index1)
+			}
+		}
 	}
 	return shape
 }
 
 // Cylinder creates a 3d cylinder shape made of a number of circular slices.
-func Cylinder(height, radius float64, slices, res int) *Shape {
-	return Cone(height, radius, radius, slices, res)
+func Cylinder(height, radius float64, slices, res int, showSlices, showLong bool) *Shape {
+	return Cone(height, radius, radius, slices, res, showSlices, showLong)
 }
 
 // GridPlane creates a 3d plane containing a grid.
@@ -109,24 +120,7 @@ func GridPlane(w, d float64, rows, cols int) *Shape {
 
 // Pyramid creates a 3d pyramid shape.
 func Pyramid(height, baseRadius float64, sides int) *Shape {
-	fsides := float64(sides)
-	shape := NewShape()
-	shape.AddXYZ(0, -height/2, 0)
-	for i := 0.0; i < fsides; i++ {
-		a := i / fsides * blmath.Tau
-		x := math.Cos(a) * baseRadius
-		y := height / 2
-		z := math.Sin(a) * baseRadius
-		shape.AddXYZ(x, y, z)
-	}
-	for i := 0; i < sides-1; i++ {
-		shape.AddSegmentByIndex(0, i+1)
-		shape.AddSegmentByIndex(i+1, i+2)
-	}
-	last := len(shape.Points) - 1
-	shape.AddSegmentByIndex(0, last)
-	shape.AddSegmentByIndex(last, 1)
-	return shape
+	return Cone(height, 0, baseRadius, 2, sides, true, true)
 }
 
 // RandomInnerSphere creates a 3d sphere made of random points inside the sphere.
@@ -172,17 +166,36 @@ func Sphere(radius float64, long, lat int, showLong, showLat bool) *Shape {
 }
 
 // Torus creates a 3d torus made of a number of circular slices.
-func Torus(r1, r2 float64, slices, res int) *Shape {
+func Torus(r1, r2, arc float64, slices, res int, showSlices, showLong bool) *Shape {
 	shape := NewShape()
 	fslice := float64(slices)
 	for i := 0.0; i < fslice; i++ {
-		angle := i / fslice * blmath.Tau
+		angle := i / fslice * arc
 		p, s := CirclePath(r2, res)
 		p.RotateX(math.Pi / 2)
 		p.TranslateX(r1)
 		p.RotateY(angle)
 		shape.Points = append(shape.Points, p...)
-		shape.Segments = append(shape.Segments, s...)
+		if showSlices {
+			shape.Segments = append(shape.Segments, s...)
+		}
+	}
+	if showLong {
+		for i := range slices - 1 {
+			for j := range res {
+				index0 := i*res + j
+				index1 := (i+1)*res + j
+				shape.AddSegmentByIndex(index0, index1)
+			}
+		}
+		if arc >= blmath.Tau {
+			i := slices - 1
+			for j := range res {
+				index0 := i*res + j
+				index1 := j
+				shape.AddSegmentByIndex(index0, index1)
+			}
+		}
 	}
 	return shape
 }

@@ -110,14 +110,14 @@ func RandomPointOnTorus(radius1, radius2 float64) *Point {
 // RandomPointInTorus creates a random 3d point IN a torus.
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
-func RandomPointInTorus(radius1, radius2 float64) *Point {
+func RandomPointInTorus(radius1, radius2, arc float64) *Point {
 	t := random.Angle()
 	radius2 *= math.Sqrt(random.Float())
 	x := math.Cos(t)*radius2 + radius1
 	y := math.Sin(t) * radius2
 	z := 0.0
 	p := NewPoint(x, y, z)
-	p.RotateY(random.Angle())
+	p.RotateY(random.FloatRange(0, arc))
 	return p
 }
 
