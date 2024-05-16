@@ -165,6 +165,24 @@ func Sphere(radius float64, long, lat int, showLong, showLat bool) *Shape {
 	return shape
 }
 
+// Spring creates a 3d spiral shape.
+func Spring(height, r0, r1, turns, res float64) *Shape {
+	shape := NewShape()
+	totalAngle := blmath.Tau * turns
+	for a := 0.0; a <= totalAngle; a += blmath.Tau / res {
+		t := a / totalAngle
+		radius := blmath.Lerp(t, r0, r1)
+		x := math.Cos(a) * radius
+		y := blmath.Lerp(t, height/2, -height/2)
+		z := math.Sin(a) * radius
+		shape.AddXYZ(x, y, z)
+	}
+	for i := range len(shape.Points) - 1 {
+		shape.AddSegmentByIndex(i, i+1)
+	}
+	return shape
+}
+
 // Torus creates a 3d torus made of a number of circular slices.
 func Torus(r1, r2, arc float64, slices, res int, showSlices, showLong bool) *Shape {
 	shape := NewShape()
