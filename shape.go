@@ -19,6 +19,14 @@ func NewShape() *Shape {
 	}
 }
 
+// AddShape adds the points and segments of another shape to this shape.
+// Does not clone the original shape, so transforms to this shape
+// will affect the added shape as well.
+func (s *Shape) AddShape(shape *Shape) {
+	s.Points = append(s.Points, shape.Points...)
+	s.Segments = append(s.Segments, shape.Segments...)
+}
+
 // AddPoint adds a point to the shape.
 func (s *Shape) AddPoint(point *Point) {
 	s.Points.Add(point)
