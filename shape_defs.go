@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/bit101/bitlib/blmath"
+	"github.com/bit101/bitlib/random"
 )
 
 // Box creates a 3d box shape.
@@ -121,6 +122,36 @@ func GridPlane(w, d float64, rows, cols int) *Shape {
 // Pyramid creates a 3d pyramid shape.
 func Pyramid(height, baseRadius float64, sides int) *Shape {
 	return Cone(height, 0, baseRadius, 2, sides, true, true)
+}
+
+func RandomInnerBox(w, h, d float64, count int) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddPoint(RandomPointInBox(w, h, d))
+	}
+	return shape
+}
+
+func RandomSurfaceBox(w, h, d float64, count int) *Shape {
+	shape := NewShape()
+	surface := (d*h + w*d + w*h) * 2
+	fcount := float64(count)
+	// left/right
+	for range int(fcount * (d * h / surface)) {
+		shape.AddXYZ(-w/2, random.FloatRange(-h/2, h/2), random.FloatRange(-d/2, d/2))
+		shape.AddXYZ(w/2, random.FloatRange(-h/2, h/2), random.FloatRange(-d/2, d/2))
+	}
+	// top/bottom
+	for range int(fcount * (w * d / surface)) {
+		shape.AddXYZ(random.FloatRange(-w/2, w/2), -h/2, random.FloatRange(-d/2, d/2))
+		shape.AddXYZ(random.FloatRange(-w/2, w/2), h/2, random.FloatRange(-d/2, d/2))
+	}
+	// front/back
+	for range int(fcount * (w * h / surface)) {
+		shape.AddXYZ(random.FloatRange(-w/2, w/2), random.FloatRange(-h/2, h/2), -d/2)
+		shape.AddXYZ(random.FloatRange(-w/2, w/2), random.FloatRange(-h/2, h/2), d/2)
+	}
+	return shape
 }
 
 // RandomInnerSphere creates a 3d sphere made of random points inside the sphere.

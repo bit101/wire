@@ -58,7 +58,7 @@ func RandomPointInSphere(radius float64) *Point {
 	x := math.Sqrt(1-u*u) * math.Cos(t)
 	y := math.Sqrt(1-u*u) * math.Sin(t)
 	z := u
-	radius = math.Sqrt(random.Float()) * radius
+	radius = math.Pow(random.Float(), 1.0/3.0) * radius
 	return NewPoint(x*radius, y*radius, z*radius)
 }
 
@@ -97,8 +97,8 @@ func RandomPointInCylinder(height, radius float64) *Point {
 // RandomPointOnTorus creates a random 3d point ON a torus.
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
-func RandomPointOnTorus(radius1, radius2 float64) *Point {
-	t := random.Angle()
+func RandomPointOnTorus(radius1, radius2, arc float64) *Point {
+	t := random.FloatRange(0, arc)
 	x := math.Cos(t)*radius2 + radius1
 	y := math.Sin(t) * radius2
 	z := 0.0
@@ -111,7 +111,7 @@ func RandomPointOnTorus(radius1, radius2 float64) *Point {
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
 func RandomPointInTorus(radius1, radius2, arc float64) *Point {
-	t := random.Angle()
+	t := random.FloatRange(0, arc)
 	radius2 *= math.Sqrt(random.Float())
 	x := math.Cos(t)*radius2 + radius1
 	y := math.Sin(t) * radius2

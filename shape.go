@@ -2,6 +2,7 @@
 package wire
 
 import (
+	"math"
 	"slices"
 )
 
@@ -83,8 +84,8 @@ func (s *Shape) AddRandomPointInCylinder(height, radius float64) {
 // AddRandomPointOnTorus creates and adds a random 3d point ON a torus.
 // radius1 is from the center of the torus to the center of the circle forming the torus.
 // radius2 is the radius of the circle forming the torus.
-func (s *Shape) AddRandomPointOnTorus(radius1, radius2 float64) {
-	s.AddPoint(RandomPointOnTorus(radius1, radius2))
+func (s *Shape) AddRandomPointOnTorus(radius1, radius2, arc float64) {
+	s.AddPoint(RandomPointOnTorus(radius1, radius2, arc))
 }
 
 // AddRandomPointInTorus creates and adds a random 3d point IN a torus.
@@ -106,6 +107,13 @@ func (s *Shape) Clone() *Shape {
 	return clone
 }
 
+func (s *Shape) RemoveSegment(seg *Segment) {
+	index := slices.Index(s.Segments, seg)
+	if index > -1 {
+		s.Segments = append(s.Segments[0:index], s.Segments[index+1:]...)
+	}
+}
+
 // Stroke strokes each path in a shape.
 func (s *Shape) Stroke() {
 	s.Points.Project()
@@ -120,22 +128,28 @@ func (s *Shape) RenderPoints(radius float64) {
 	s.Points.RenderPoints(radius)
 }
 
-// Subdivide puts a new point between each pair of points.
-func (s *Shape) Subdivide(times int) {
-	for range times {
-		for _, seg := range s.Segments {
-			a := seg.PointA
-			b := seg.PointB
-			x := (a.X + b.X) / 2
-			y := (a.Y + b.Y) / 2
-			z := (a.Z + b.Z) / 2
-			p := NewPoint(x, y, z)
-			s.AddPoint(p)
-			seg.PointB = p
-			newSeg := NewSegment(p, b)
-			s.Segments = append(s.Segments, newSeg)
+// Subdivide subdivides segments so that no segment is longer than maxDist.
+func (s *Shape) Subdivide(maxDist float64) {
+	newSegs := []*Segment{}
+	for _, seg := range s.Segments {
+		dx := seg.PointB.X - seg.PointA.X
+		dy := seg.PointB.Y - seg.PointA.Y
+		dz := seg.PointB.Z - seg.PointA.Z
+		segLength := math.Sqrt(dx*dx + dy*dy + dz*dz)
+		count := math.Round(segLength / maxDist)
+		p0 := seg.PointA
+		first := seg.PointA
+		last := seg.PointB
+
+		for i := 1.0; i < count; i++ {
+			p1 := first.Translated(dx/count*i, dy/count*i, dz/count*i)
+			s.AddPoint(p1)
+			newSegs = append(newSegs, NewSegment(p0, p1))
+			p0 = p1
 		}
+		newSegs = append(newSegs, NewSegment(p0, last))
 	}
+	s.Segments = newSegs
 }
 
 // Cull removes points from the shape that do not satisfy the cull function. Modifies shape in place.
