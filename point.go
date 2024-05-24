@@ -52,13 +52,23 @@ func RandomPointOnSphere(radius float64) *Point {
 // RandomPointInSphere creates a random 3d point IN a sphere of the given radius.
 // https://mathworld.wolfram.com/SpherePointPicking.html
 // Main change from the on-surface version is radius is randomized.
+// It uses a distribution of 1/3 which evenly distributes the points throughout the sphere.
 func RandomPointInSphere(radius float64) *Point {
+	return RandomPointInSphereDist(radius, 3)
+}
+
+// RandomPointInSphereDist creates a random 3d point IN a sphere of the given radius.
+// https://mathworld.wolfram.com/SpherePointPicking.html
+// The dist value lets you adjust the distribution of points. A value of 3 will result in a
+// completely even distribution of points throughout the sphere. Lower values will concentrate
+// points in the center of the sphere and higher values will send them to the edges.
+func RandomPointInSphereDist(radius, dist float64) *Point {
 	u := random.FloatRange(-1, 1)
 	t := random.Angle()
 	x := math.Sqrt(1-u*u) * math.Cos(t)
 	y := math.Sqrt(1-u*u) * math.Sin(t)
 	z := u
-	radius = math.Pow(random.Float(), 1.0/3.0) * radius
+	radius = math.Pow(random.Float(), 1.0/dist) * radius
 	return NewPoint(x*radius, y*radius, z*radius)
 }
 

@@ -1,6 +1,8 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
+import "github.com/bit101/bitlib/noise"
+
 // PointList represents a list of 3d points.
 type PointList []*Point
 
@@ -274,7 +276,17 @@ func (p PointList) Push(pusher *Point, radius float64) {
 			point.Y += pusher.Y
 			point.Z += pusher.Z
 		}
+	}
+}
 
+func (p PointList) Noisify(origin *Point, scale, offset float64) {
+	for _, point := range p {
+		n := noise.Simplex3(
+			origin.X+point.X*scale,
+			origin.Y+point.Y*scale,
+			origin.Z+point.Z*scale,
+		)
+		point.UniScale(1.0 + n*offset)
 	}
 }
 

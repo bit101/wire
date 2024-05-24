@@ -96,26 +96,43 @@ func Cylinder(height, radius float64, slices, res int, showSlices, showLong bool
 
 // GridPlane creates a 3d plane containing a grid.
 func GridPlane(w, d float64, rows, cols int) *Shape {
+	fcols := float64(cols)
+	frows := float64(rows)
 	shape := NewShape()
-	for x := 0.0; x <= float64(rows); x++ {
-		for z := 0.0; z <= float64(cols); z++ {
-			shape.Points = append(shape.Points, NewPoint(x, 0, z))
-		}
-	}
-	for x := 0; x <= rows; x++ {
-		for z := 0; z <= cols; z++ {
-			index := x + z*(rows+1)
-			if x < rows {
-				shape.AddSegmentByIndex(index, index+1)
-			}
-			if z < cols {
-				shape.AddSegmentByIndex(index, index+rows+1)
-			}
-		}
-	}
-	shape.Scale(w/float64(rows), 1, d/float64(cols))
-	shape.Translate(-w/2, 0, -d/2)
 
+	// corners
+	shape.AddXYZ(-w/2, 0, -d/2)
+	shape.AddXYZ(w/2, 0, -d/2)
+	shape.AddXYZ(w/2, 0, d/2)
+	shape.AddXYZ(-w/2, 0, d/2)
+
+	// outside edges
+	shape.AddSegmentByIndex(0, 1)
+	shape.AddSegmentByIndex(1, 2)
+	shape.AddSegmentByIndex(2, 3)
+	shape.AddSegmentByIndex(3, 0)
+
+	// inner lines...
+	// columns
+	for i := 1.0; i < frows; i++ {
+		x := -w/2 + i/frows*w
+		p0 := NewPoint(x, 0, -d/2)
+		p1 := NewPoint(x, 0, d/2)
+		shape.AddPoint(p0)
+		shape.AddPoint(p1)
+		shape.AddSegmentByPoints(p0, p1)
+	}
+
+	// inner lines...
+	// rows
+	for i := 1.0; i < fcols; i++ {
+		z := -d/2 + i/fcols*d
+		p0 := NewPoint(-w/2, 0, z)
+		p1 := NewPoint(w/2, 0, z)
+		shape.AddPoint(p0)
+		shape.AddPoint(p1)
+		shape.AddSegmentByPoints(p0, p1)
+	}
 	return shape
 }
 

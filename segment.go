@@ -24,3 +24,8 @@ func (s *Segment) Stroke() {
 	}
 	world.Context.SetLineWidth(lineWidth)
 }
+
+// Length returns the length of this segment.
+func (s *Segment) Length() float64 {
+	return s.PointA.Distance(s.PointB)
+}
