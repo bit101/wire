@@ -153,13 +153,18 @@ func (s *Shape) Subdivide(maxDist float64) {
 }
 
 // Cull removes points from the shape that do not satisfy the cull function. Modifies shape in place.
-// TODO: cull segments not just points
 func (s *Shape) Cull(cullFunc func(*Point) bool) {
+	segs := []*Segment{}
+	for _, seg := range s.Segments {
+		if cullFunc(seg.PointA) && cullFunc(seg.PointB) {
+			segs = append(segs, seg)
+		}
+	}
+	s.Segments = segs
 	s.Points.Cull(cullFunc)
 }
 
 // Culled returns a new shape with points removed that do not satisfy the cull function.
-// TODO: cull segments not just points
 func (s *Shape) Culled(cullFunc func(*Point) bool) *Shape {
 	s1 := s.Clone()
 	s1.Cull(cullFunc)
