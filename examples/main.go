@@ -18,7 +18,7 @@ func main() {
 		render.CreateAndViewImage(800, 800, "out/out.png", scene1, 0.0)
 	} else if renderTarget == target.Video {
 		program := render.NewProgram(400, 400, 30)
-		program.AddSceneWithFrames(scene1, 360)
+		program.AddSceneWithFrames(scene2, 360)
 		program.RenderAndPlayVideo("out/frames", "out/out.mp4")
 	}
 }
@@ -45,4 +45,23 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 	context.GaussianBlur(20)
 	context.SetLineWidth(0.5)
 	s.Stroke()
+}
+
+func scene2(context *cairo.Context, width, height, percent float64) {
+	context.WhiteOnBlack()
+	context.SetLineJoin(cairo.LineJoinRound)
+	wire.InitWorld(context, width/2, height/2, 800)
+
+	t := wire.NewString("foobarbaz", wire.FontAsteroid).AsCylinder(-400, 20)
+	t.RotateY(percent * blmath.Tau * 1)
+	t2 := wire.NewString("foobarbaz", wire.FontAsteroid).AsVCylinder(-400, 20)
+	t2.RotateX(percent * blmath.Tau * 1)
+
+	context.SetLineWidth(1)
+	t.Stroke()
+	t2.Stroke()
+	// context.GaussianBlur(20)
+	// context.SetLineWidth(0.5)
+	// t.Stroke()
+	// t2.Stroke()
 }
