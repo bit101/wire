@@ -141,6 +141,7 @@ func Pyramid(height, baseRadius float64, sides int) *Shape {
 	return Cone(height, 0, baseRadius, 2, sides, true, true)
 }
 
+// RandomInnerBox creates a 3d box filled with random points.
 func RandomInnerBox(w, h, d float64, count int) *Shape {
 	shape := NewShape()
 	for range count {
@@ -149,6 +150,7 @@ func RandomInnerBox(w, h, d float64, count int) *Shape {
 	return shape
 }
 
+// RandomSurfaceBox creates a 3d box made of random points on the surface of the box.
 func RandomSurfaceBox(w, h, d float64, count int) *Shape {
 	shape := NewShape()
 	surface := (d*h + w*d + w*h) * 2
@@ -185,6 +187,42 @@ func RandomSurfaceSphere(radius float64, count int) *Shape {
 	shape := NewShape()
 	for range count {
 		shape.AddRandomPointOnSphere(radius)
+	}
+	return shape
+}
+
+// RandomInnerCylinder creates a 3d cylinder made of random point inside the cylinder.
+func RandomInnerCylinder(height, radius float64, count int) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddRandomPointInCylinder(height, radius)
+	}
+	return shape
+}
+
+// RandomSurfaceCylinder creates a 3d cylinder made of random point  on the surface of the cylinder.
+func RandomSurfaceCylinder(height, radius float64, count int, includeCaps bool) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddRandomPointOnCylinder(height, radius, includeCaps)
+	}
+	return shape
+}
+
+// RandomInnerTorus creates a 3d torus made of random point inside the torus.
+func RandomInnerTorus(radius1, radius2, arc float64, count int) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddRandomPointInTorus(radius1, radius2, arc)
+	}
+	return shape
+}
+
+// RandomSurfaceTorus creates a 3d torus made of random point  on the surface of the torus.
+func RandomSurfaceTorus(radius1, radius2, arc float64, count int) *Shape {
+	shape := NewShape()
+	for range count {
+		shape.AddRandomPointOnTorus(radius1, radius2, arc)
 	}
 	return shape
 }

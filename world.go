@@ -34,23 +34,29 @@ type worldDef struct {
 	FarFog      float64
 	R, G, B     float64
 	Context     Context
+	Font        FontType
+	FontSize    float64
+	FontSpacing float64
 }
 
 // World contains the parameters for the 3d world.
 var world = worldDef{
-	FL:        300.0,
-	CX:        0.0,
-	CY:        0.0,
-	CZ:        0.0,
-	NearZ:     100.0,
-	FarZ:      100000.0,
-	FogActive: false,
-	NearFog:   400.0,
-	FarFog:    1200.0,
-	R:         1,
-	G:         1,
-	B:         1,
-	Context:   nil,
+	FL:          300.0,
+	CX:          0.0,
+	CY:          0.0,
+	CZ:          0.0,
+	NearZ:       100.0,
+	FarZ:        100000.0,
+	FogActive:   false,
+	NearFog:     400.0,
+	FarFog:      1200.0,
+	R:           1,
+	G:           1,
+	B:           1,
+	Context:     nil,
+	Font:        FontAsteroid,
+	FontSize:    100,
+	FontSpacing: 0.2,
 }
 
 // InitWorld initializes the world.
@@ -104,4 +110,31 @@ func SetFog(active bool, near, far float64) {
 	world.FogActive = active
 	world.NearFog = near
 	world.FarFog = far
+}
+
+// SetFont sets the font type, size and spacing for future text objects.
+// Size is the width of a single letter. Default 100.
+// Spacing is the space between letters, as a percentage of letter width. Defaults to 0.2.
+func SetFont(font FontType, size, spacing float64) {
+	world.Font = font
+	world.FontSize = size
+	world.FontSpacing = spacing
+}
+
+// SetFontType sets which font type will be used for future text objects.
+// Default is wire.FontAsteroid.
+func SetFontType(font FontType) {
+	world.Font = font
+}
+
+// SetFontSize sets the font size (width of one letter) used for future text objects.
+// Default is 100.
+func SetFontSize(size float64) {
+	world.FontSize = size
+}
+
+// SetFontSpacing sets the spacing between letters, as a percentage of letter width.
+// Default is 0.2.
+func SetFontSpacing(spacing float64) {
+	world.FontSpacing = spacing
 }
