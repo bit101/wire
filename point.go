@@ -86,12 +86,29 @@ func RandomPointInRectangle(w, d float64) *Point {
 }
 
 // RandomPointOnCylinder creates a random 3d point ON a cylinder of the given radius and height.
-func RandomPointOnCylinder(height, radius float64) *Point {
+// Can optionally include the caps on not.
+func RandomPointOnCylinder(height, radius float64, includeCaps bool) *Point {
 	angle := random.Angle()
-	x := math.Cos(angle) * radius
-	y := random.FloatRange(-height/2, height/2)
-	z := math.Sin(angle) * radius
-	return NewPoint(x, y, z)
+	cylArea := radius * blmath.Tau * height
+	capArea := math.Pi * radius * radius
+	totalArea := cylArea + capArea*2
+
+	n := random.Float() * totalArea
+
+	if !includeCaps || n < cylArea {
+		x := math.Cos(angle) * radius
+		y := random.FloatRange(-height/2, height/2)
+		z := math.Sin(angle) * radius
+		return NewPoint(x, y, z)
+	}
+
+	p := RandomPointInCircle(radius)
+	if n < cylArea+capArea {
+		p.TranslateY(-height / 2)
+	} else {
+		p.TranslateY(height / 2)
+	}
+	return p
 }
 
 // RandomPointInCylinder creates a random 3d point IN a cylinder of the given radius and height.

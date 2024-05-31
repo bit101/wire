@@ -72,8 +72,8 @@ func (s *Shape) AddRandomPointInSphere(radius float64) {
 }
 
 // AddRandomPointOnCylinder creates and adds a random 3d point ON a cylinder of the given radius and height.
-func (s *Shape) AddRandomPointOnCylinder(height, radius float64) {
-	s.AddPoint(RandomPointOnCylinder(height, radius))
+func (s *Shape) AddRandomPointOnCylinder(height, radius float64, includeCaps bool) {
+	s.AddPoint(RandomPointOnCylinder(height, radius, includeCaps))
 }
 
 // AddRandomPointInCylinder creates and adds a random 3d point IN a cylinder of the given radius and height.
