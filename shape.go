@@ -115,10 +115,10 @@ func (s *Shape) RemoveSegment(seg *Segment) {
 }
 
 // Stroke strokes each path in a shape.
-func (s *Shape) Stroke() {
+func (s *Shape) Stroke(width float64) {
 	s.Points.Project()
 	for _, segment := range s.Segments {
-		segment.Stroke()
+		segment.Stroke(width)
 	}
 }
 
