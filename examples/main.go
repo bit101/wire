@@ -39,12 +39,10 @@ func scene1(context *cairo.Context, width, height, percent float64) {
 
 	s := sphere.Rotated(-percent*blmath.Tau, -percent*blmath.Tau*2, 0)
 
-	context.SetLineWidth(1)
-	s.Stroke()
+	s.Stroke(1)
 
 	context.GaussianBlur(20)
-	context.SetLineWidth(0.5)
-	s.Stroke()
+	s.Stroke(0.5)
 }
 
 func scene2(context *cairo.Context, width, height, percent float64) {
@@ -57,11 +55,9 @@ func scene2(context *cairo.Context, width, height, percent float64) {
 	t2 := wire.NewString("foobarbaz", wire.FontAsteroid).AsVCylinder(-400, 20)
 	t2.RotateX(percent * blmath.Tau * 1)
 
-	context.SetLineWidth(1)
-	t.Stroke()
-	t2.Stroke()
+	t.Stroke(1)
+	t2.Stroke(1)
 	// context.GaussianBlur(20)
-	// context.SetLineWidth(0.5)
-	// t.Stroke()
-	// t2.Stroke()
+	// t.Stroke(0.5)
+	// t2.Stroke(0.5)
 }

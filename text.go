@@ -7,11 +7,6 @@ import (
 	"strings"
 )
 
-var (
-	// FontWidth is the width of one character.
-	FontWidth = 100.0
-)
-
 //////////////////////////////
 // String type
 //////////////////////////////
@@ -26,14 +21,14 @@ type String struct {
 }
 
 // NewString creates a new 3d string object.
-func NewString(str string, font FontType) *String {
+func NewString(str string) *String {
 	str = strings.ToUpper(str)
 	paths := []*Shape{}
 	for _, s := range str {
-		char := ParseChar(string(s), font)
+		char := ParseChar(string(s), world.Font)
 		paths = append(paths, char)
 	}
-	return &String{str, paths, font.width / font.height}
+	return &String{str, paths, world.Font.width / world.Font.height}
 }
 
 // ParseChar parses a single character into a single 3d shape.
@@ -61,14 +56,15 @@ func ParseChar(char string, fontData FontType) *Shape {
 			index++
 		}
 	}
-	shape.UniScale(FontWidth / 2)
+	shape.UniScale(world.FontSize / 2)
 	return shape
 }
 
 // AsCylinder creates a single shape consisting of the all the chars in the string wrapped around a cylinder.
-func (s *String) AsCylinder(radius, spacing float64) *Shape {
+func (s *String) AsCylinder(radius float64) *Shape {
 	shape := NewShape()
-	angle := math.Atan2(FontWidth/2+spacing, radius) * 2
+	spacing := world.FontSize * world.FontSpacing
+	angle := math.Atan2(world.FontSize/2+spacing, radius) * 2
 	for _, pl := range s.Letters {
 		pl.TranslateZ(-radius)
 		shape.Points = append(shape.Points, pl.Points...)
@@ -80,9 +76,10 @@ func (s *String) AsCylinder(radius, spacing float64) *Shape {
 }
 
 // AsVCylinder creates a single shape consisting of the all the chars in the string layed out vertically and wrapped around a cylinder.
-func (s *String) AsVCylinder(radius, spacing float64) *Shape {
+func (s *String) AsVCylinder(radius float64) *Shape {
 	shape := NewShape()
-	fontHalfHeight := FontWidth / 2 / s.AspectRatio
+	fontHalfHeight := world.FontSize / 2 / s.AspectRatio
+	spacing := world.FontSize * world.FontSpacing
 	angle := math.Atan2(fontHalfHeight+spacing, radius) * 2
 	for _, pl := range s.Letters {
 		pl.TranslateZ(-radius)
@@ -95,22 +92,24 @@ func (s *String) AsVCylinder(radius, spacing float64) *Shape {
 }
 
 // AsLine creates a single shape consisting of all the chars in the string laid out in a single horizontal line.
-func (s *String) AsLine(spacing float64) *Shape {
+func (s *String) AsLine() *Shape {
 	shape := NewShape()
+	spacing := world.FontSize * world.FontSpacing
 	for i, pl := range s.Letters {
-		pl.TranslateX(FontWidth/2 + (FontWidth+spacing)*float64(i))
+		pl.TranslateX(world.FontSize/2 + (world.FontSize+spacing)*float64(i))
 		shape.Points = append(shape.Points, pl.Points...)
 		shape.Segments = append(shape.Segments, pl.Segments...)
 	}
 	mult := float64(len(s.Letters))
-	shape.TranslateX(-(FontWidth+spacing)*mult/2 + spacing/2)
+	shape.TranslateX(-(world.FontSize+spacing)*mult/2 + spacing/2)
 	return shape
 }
 
 // AsVLine creates a single shape consisting of all the chars in the string laid out in a single vertical line.
-func (s *String) AsVLine(spacing float64) *Shape {
+func (s *String) AsVLine() *Shape {
 	shape := NewShape()
-	fontHeight := FontWidth / s.AspectRatio
+	fontHeight := world.FontSize / s.AspectRatio
+	spacing := world.FontSize * world.FontSpacing
 	for i, pl := range s.Letters {
 		pl.TranslateY(fontHeight/2 + (fontHeight+spacing)*float64(i))
 		shape.Points = append(shape.Points, pl.Points...)
