@@ -55,6 +55,12 @@ func (s *Shape) AddSegmentByIndex(a, b int) {
 	s.Segments = append(s.Segments, seg)
 }
 
+// AddRandomPointOnBox creates and adds a new 3d point on the surface of a 3d box of the given dimensions.
+// The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
+func (s *Shape) AddRandomPointOnBox(w, h, d float64) {
+	s.AddPoint(RandomPointOnBox(w, h, d))
+}
+
 // AddRandomPointInBox creates and adds a new 3d point within a 3d box of the given dimensions.
 // The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
 func (s *Shape) AddRandomPointInBox(w, h, d float64) {
@@ -107,6 +113,7 @@ func (s *Shape) Clone() *Shape {
 	return clone
 }
 
+// RemoveSegment removes the given segment from the shape's segment list.
 func (s *Shape) RemoveSegment(seg *Segment) {
 	index := slices.Index(s.Segments, seg)
 	if index > -1 {

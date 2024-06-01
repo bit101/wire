@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/bit101/bitlib/blmath"
-	"github.com/bit101/bitlib/random"
 )
 
 // Box creates a 3d box shape.
@@ -153,22 +152,8 @@ func RandomInnerBox(w, h, d float64, count int) *Shape {
 // RandomSurfaceBox creates a 3d box made of random points on the surface of the box.
 func RandomSurfaceBox(w, h, d float64, count int) *Shape {
 	shape := NewShape()
-	surface := (d*h + w*d + w*h) * 2
-	fcount := float64(count)
-	// left/right
-	for range int(fcount * (d * h / surface)) {
-		shape.AddXYZ(-w/2, random.FloatRange(-h/2, h/2), random.FloatRange(-d/2, d/2))
-		shape.AddXYZ(w/2, random.FloatRange(-h/2, h/2), random.FloatRange(-d/2, d/2))
-	}
-	// top/bottom
-	for range int(fcount * (w * d / surface)) {
-		shape.AddXYZ(random.FloatRange(-w/2, w/2), -h/2, random.FloatRange(-d/2, d/2))
-		shape.AddXYZ(random.FloatRange(-w/2, w/2), h/2, random.FloatRange(-d/2, d/2))
-	}
-	// front/back
-	for range int(fcount * (w * h / surface)) {
-		shape.AddXYZ(random.FloatRange(-w/2, w/2), random.FloatRange(-h/2, h/2), -d/2)
-		shape.AddXYZ(random.FloatRange(-w/2, w/2), random.FloatRange(-h/2, h/2), d/2)
+	for range count {
+		shape.AddPoint(RandomPointOnBox(w, h, d))
 	}
 	return shape
 }

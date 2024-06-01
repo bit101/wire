@@ -1,7 +1,11 @@
 // Package wire implements wireframe 3d shapes.
 package wire
 
-import "github.com/bit101/bitlib/noise"
+import (
+	"log"
+
+	"github.com/bit101/bitlib/noise"
+)
 
 // PointList represents a list of 3d points.
 type PointList []*Point
@@ -20,6 +24,17 @@ func (p PointList) Clone() PointList {
 	return list
 }
 
+// Lerp interpolates thispoint list towards another, in place.
+// Thus, it should maintain segment relationships.
+func (p PointList) Lerp(t float64, other PointList) {
+	if len(p) != len(other) {
+		log.Fatal("lengths of point lists must be equal when lerping between them")
+	}
+	for i := 0; i < len(p); i++ {
+		p[i].Lerp(t, other[i])
+	}
+}
+
 // Add adds a new point to this list.
 func (p *PointList) Add(point *Point) {
 	*p = append(*p, point)
@@ -28,6 +43,12 @@ func (p *PointList) Add(point *Point) {
 // AddXYZ creates and adds a new point to this list.
 func (p *PointList) AddXYZ(x, y, z float64) {
 	*p = append(*p, NewPoint(x, y, z))
+}
+
+// AddRandomPointOnBox creates and adds a new 3d point on the surface of a 3d box of the given dimensions.
+// The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
+func (p *PointList) AddRandomPointOnBox(w, h, d float64) {
+	p.Add(RandomPointOnBox(w, h, d))
 }
 
 // AddRandomPointInBox creates and adds a new 3d point within a 3d box of the given dimensions.
@@ -279,6 +300,7 @@ func (p PointList) Push(pusher *Point, radius float64) {
 	}
 }
 
+// Noisify scales a point based on its postion in a 3d simplex noise field.
 func (p PointList) Noisify(origin *Point, scale, offset float64) {
 	for _, point := range p {
 		n := noise.Simplex3(

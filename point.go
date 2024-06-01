@@ -28,6 +28,38 @@ func LerpPoint(t float64, p0, p1 *Point) *Point {
 	)
 }
 
+// RandomPointOnBox creates a new random point on the surface of a box.
+func RandomPointOnBox(w, h, d float64) *Point {
+	surface := (d*h + w*d + w*h) * 2
+	n := random.Float() * surface
+	// left
+	if n < d*h {
+		return NewPoint(-w/2, random.FloatRange(-h/2, h/2), random.FloatRange(-d/2, d/2))
+	}
+	// right
+	n -= d * h
+	if n < d*h {
+		return NewPoint(w/2, random.FloatRange(-h/2, h/2), random.FloatRange(-d/2, d/2))
+	}
+	// top
+	n -= d * h
+	if n < w*d {
+		return NewPoint(random.FloatRange(-w/2, w/2), -h/2, random.FloatRange(-d/2, d/2))
+	}
+	// bottom
+	n -= w * d
+	if n < d*h {
+		return NewPoint(random.FloatRange(-w/2, w/2), h/2, random.FloatRange(-d/2, d/2))
+	}
+	// front
+	n -= w * d
+	if n < w*h {
+		return NewPoint(random.FloatRange(-w/2, w/2), random.FloatRange(-h/2, h/2), -d/2)
+	}
+	// back
+	return NewPoint(random.FloatRange(-w/2, w/2), random.FloatRange(-h/2, h/2), d/2)
+}
+
 // RandomPointInBox creates a new 3d point within a 3d box of the given dimensions.
 // The box is centered on the origin, so points will range from -w/2 to w/2, etc. on each dimension.
 func RandomPointInBox(w, h, d float64) *Point {
@@ -151,6 +183,13 @@ func RandomPointInTorus(radius1, radius2, arc float64) *Point {
 // Clone returns a copy of this point.
 func (p *Point) Clone() *Point {
 	return &Point{p.X, p.Y, p.Z, p.Px, p.Py, p.Scaling}
+}
+
+// Lerp interpolates this point to another point, in place.
+func (p *Point) Lerp(t float64, p1 *Point) {
+	p.X = blmath.Lerp(t, p.X, p1.X)
+	p.Y = blmath.Lerp(t, p.Y, p1.Y)
+	p.Z = blmath.Lerp(t, p.Z, p1.Z)
 }
 
 // Project projects this 3d point to a 2d point, by setting the Px, Py and Scaling properties of this point.
