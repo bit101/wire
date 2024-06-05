@@ -33,14 +33,17 @@ That said, these constraints make space for a good amount of creativity in multi
 
 - A decent set of 3d primitives:
   - Sphere
+  - Circle
   - Cylinder
   - Cone
   - Box
+  - Pyramid
   - Torus
+  - Torus knot
   - GridPlane
   - Spring
   - Text
-- Most of these can be rendered as:
+- Where it makes sense, most of these can be rendered as:
   - Wireframe, with configurable longitudinal and latitudinal sections
   - Random points on the surface
   - Random points filling the object
@@ -52,3 +55,7 @@ That said, these constraints make space for a good amount of creativity in multi
   - Subdivided
   - Randomized
   - Noisified (Simplex noise)
+
+## Examples
+
+See: [https://www.artfromcode.com/tags/wire/](https://www.artfromcode.com/tags/wire/) for some examples of what is possible.
