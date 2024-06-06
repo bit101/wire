@@ -4,6 +4,8 @@ package wire
 import (
 	"math"
 	"slices"
+
+	"github.com/bit101/bitlib/geom"
 )
 
 // Shape is a 3d shape composed of a list of points and segments connecting them.
@@ -18,6 +20,21 @@ func NewShape() *Shape {
 		PointList{},
 		[]*Segment{},
 	}
+}
+
+// ShapeFrom2dPath creates a shape from a geom.PointList.
+func ShapeFrom2dPath(path geom.PointList, closed bool) *Shape {
+	shape := NewShape()
+	for _, p := range path {
+		shape.AddXYZ(p.X, p.Y, 0)
+	}
+	for i := range len(path) - 1 {
+		shape.AddSegmentByIndex(i, i+1)
+	}
+	if closed {
+		shape.AddSegmentByPoints(shape.Points.Last(), shape.Points.First())
+	}
+	return shape
 }
 
 // AddShape adds the points and segments of another shape to this shape.
@@ -182,6 +199,34 @@ func (s *Shape) Culled(cullFunc func(*Point) bool) *Shape {
 // TODO: cull segments not just points
 func (s *Shape) CullBox(minX, minY, minZ, maxX, maxY, maxZ float64) {
 	s.Points.CullBox(minX, minY, minZ, maxX, maxY, maxZ)
+}
+
+// ThinPoints is used to thin out a dense model. It will keep `take` number of points,
+// and then discard `skip` number of points, repeating until all points are processed.
+// To thin by 25% use ThinPoints(3, 1). To thin by 75%, ThinPoints(1, 3).
+// TODO: remove invalidated segments.
+func (s *Shape) ThinPoints(take, skip int) {
+	points := NewPointList()
+	i := 0
+	max := len(s.Points)
+	for i < max {
+		for range take {
+			if i >= max {
+				s.Points = points
+				return
+			}
+			points.Add(s.Points[i])
+			i++
+		}
+		for range skip {
+			if i >= max {
+				s.Points = points
+				return
+			}
+			i++
+		}
+	}
+	s.Points = points
 }
 
 //////////////////////////////
