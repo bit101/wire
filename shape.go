@@ -229,6 +229,17 @@ func (s *Shape) ThinPoints(take, skip int) {
 	s.Points = points
 }
 
+// Split culls points that satisfy the split function,
+// then adds those points to a new shape and returns that.
+// TODO: handle segments
+func (s *Shape) Split(split func(p *Point) bool) *Shape {
+	newShape := s.Culled(split)
+	s.Cull(func(p *Point) bool {
+		return !split(p)
+	})
+	return newShape
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////

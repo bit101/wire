@@ -3,6 +3,7 @@ package wire
 
 import (
 	"log"
+	"slices"
 
 	"github.com/bit101/bitlib/noise"
 )
@@ -159,6 +160,48 @@ func (p *PointList) CullBox(minX, minY, minZ, maxX, maxY, maxZ float64) {
 		}
 	}
 	*p = newList
+}
+
+// SortX sorts the point list by x value.
+func (p *PointList) SortX(ascending bool) {
+	retval := 1
+	if !ascending {
+		retval = -1
+	}
+	slices.SortFunc(*p, func(a, b *Point) int {
+		if a.X > b.X {
+			return retval
+		}
+		return -retval
+	})
+}
+
+// SortY sorts the point list by y value.
+func (p *PointList) SortY(ascending bool) {
+	retval := 1
+	if !ascending {
+		retval = -1
+	}
+	slices.SortFunc(*p, func(a, b *Point) int {
+		if a.Y > b.Y {
+			return retval
+		}
+		return -retval
+	})
+}
+
+// SortZ sorts the point list by z value.
+func (p *PointList) SortZ(ascending bool) {
+	retval := 1
+	if !ascending {
+		retval = -1
+	}
+	slices.SortFunc(*p, func(a, b *Point) int {
+		if a.Z > b.Z {
+			return retval
+		}
+		return -retval
+	})
 }
 
 //////////////////////////////
