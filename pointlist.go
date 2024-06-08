@@ -355,6 +355,13 @@ func (p PointList) Noisify(origin *Point, scale, offset float64) {
 	}
 }
 
+// Normalize normalizes all the points in this list.
+func (p PointList) Normalize() {
+	for _, point := range p {
+		point.Normalize()
+	}
+}
+
 //////////////////////////////
 // Transform and return new
 //////////////////////////////
@@ -475,5 +482,12 @@ func (p PointList) RandomizedZ(amount float64) PointList {
 func (p PointList) Randomized(amount float64) PointList {
 	p1 := p.Clone()
 	p1.Randomize(amount)
+	return p1
+}
+
+// Normalized returns a copy of this list, normalized.
+func (p PointList) Normalized() PointList {
+	p1 := p.Clone()
+	p1.Normalize()
 	return p1
 }

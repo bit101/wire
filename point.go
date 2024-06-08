@@ -192,6 +192,11 @@ func (p *Point) Lerp(t float64, p1 *Point) {
 	p.Z = blmath.Lerp(t, p.Z, p1.Z)
 }
 
+// Magnitude returns the distance from the origin to this point.
+func (p *Point) Magnitude() float64 {
+	return math.Sqrt(p.X*p.X + p.Y*p.Y + p.Z*p.Z)
+}
+
 // Project projects this 3d point to a 2d point, by setting the Px, Py and Scaling properties of this point.
 func (p *Point) Project() {
 	scale := world.FL / (world.CZ + p.Z)
@@ -333,6 +338,14 @@ func (p *Point) Randomize(amount float64) {
 	p.Z += random.FloatRange(-amount, amount)
 }
 
+// Normalize normalizes each component ofthis point, in place.
+func (p *Point) Normalize() {
+	mag := p.Magnitude()
+	p.X /= mag
+	p.Y /= mag
+	p.Z /= mag
+}
+
 //////////////////////////////
 // Transform and return new
 //////////////////////////////
@@ -453,5 +466,12 @@ func (p *Point) RandomizedZ(amount float64) *Point {
 func (p *Point) Randomized(amount float64) *Point {
 	p1 := p.Clone()
 	p1.Randomize(amount)
+	return p1
+}
+
+// Normalized returns a copy of this point, normalized.
+func (p *Point) Normalized() *Point {
+	p1 := p.Clone()
+	p1.Normalize()
 	return p1
 }

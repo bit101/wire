@@ -37,6 +37,28 @@ func ShapeFrom2dPath(path geom.PointList, closed bool) *Shape {
 	return shape
 }
 
+// Lure3d  is an interface for a 3d attractor.
+// Included here to decouple the concrete lures library and avoid a direct dependecy.
+type Lure3d interface {
+	GetScale() float64
+	InitVals3d() (float64, float64, float64)
+	Center3d() (float64, float64, float64)
+	Iterate(x, y, z float64) (float64, float64, float64)
+}
+
+// ShapeFromLure creates a shape filled with points forming a strange attractor.
+func ShapeFromLure(lure Lure3d, count int) *Shape {
+	s := NewShape()
+	x, y, z := lure.InitVals3d()
+	for range count {
+		s.AddXYZ(x, y, z)
+		x, y, z = lure.Iterate(x, y, z)
+	}
+	s.Translate(lure.Center3d())
+	s.UniScale(lure.GetScale())
+	return s
+}
+
 // AddShape adds the points and segments of another shape to this shape.
 // Does not clone the original shape, so transforms to this shape
 // will affect the added shape as well.
