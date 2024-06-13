@@ -54,10 +54,6 @@ func ShapeFromXYZ(fileName string) *Shape {
 	}
 	defer file.Close()
 
-	// values
-	minX, minY, minZ := math.MaxFloat64, math.MaxFloat64, math.MaxFloat64
-	maxX, maxY, maxZ := -math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64
-
 	// read lines
 	lineNum := 1
 	scanner := bufio.NewScanner(file)
@@ -72,12 +68,6 @@ func ShapeFromXYZ(fileName string) *Shape {
 			x := getFloat(match[1], lineNum)
 			y := getFloat(match[2], lineNum)
 			z := getFloat(match[3], lineNum)
-			minX = math.Min(minX, x)
-			minY = math.Min(minY, y)
-			minZ = math.Min(minZ, z)
-			maxX = math.Max(maxX, x)
-			maxY = math.Max(maxY, y)
-			maxZ = math.Max(maxZ, z)
 			model.AddXYZ(x, y, z)
 		} else if lineNum > 2 {
 			// per xyz spec fisrt two lines are optionally:
@@ -88,14 +78,8 @@ func ShapeFromXYZ(fileName string) *Shape {
 		lineNum++
 	}
 
-	// center model
-	model.Translate(
-		-minX-(maxX-minX)/2,
-		-minY-(maxY-minY)/2,
-		-minZ-(maxZ-minZ)/2,
-	)
-
 	// adjust to wire's coord system
+	model.Center()
 	model.Rotate(-math.Pi/2, math.Pi, 0)
 	return model
 }

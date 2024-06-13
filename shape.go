@@ -262,6 +262,25 @@ func (s *Shape) Split(split func(p *Point) bool) *Shape {
 	return newShape
 }
 
+func (s *Shape) Center() {
+	minX, minY, minZ := math.MaxFloat64, math.MaxFloat64, math.MaxFloat64
+	maxX, maxY, maxZ := -math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64
+
+	for _, p := range s.Points {
+		minX = math.Min(minX, p.X)
+		minY = math.Min(minY, p.Y)
+		minZ = math.Min(minZ, p.Z)
+		maxX = math.Max(maxX, p.X)
+		maxY = math.Max(maxY, p.Y)
+		maxZ = math.Max(maxZ, p.Z)
+	}
+	s.Points.Translate(
+		-minX-(maxX-minX)/2,
+		-minY-(maxY-minY)/2,
+		-minZ-(maxZ-minZ)/2,
+	)
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////
