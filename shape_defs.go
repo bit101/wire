@@ -93,45 +93,71 @@ func Cylinder(height, radius float64, slices, res int, showSlices, showLong bool
 	return Cone(height, radius, radius, slices, res, showSlices, showLong)
 }
 
+// GridBox creates a 3d box shape where each surface is a grid.
+// If inner is true, it will create a full lattice.
+func GridBox(w, h, d float64, xCount, yCount, zCount int, inner bool) *Shape {
+	shape := NewShape()
+	fx, fy, fz := float64(xCount), float64(yCount), float64(zCount)
+
+	// points
+	for z := 0.0; z <= fz; z++ {
+		for y := 0.0; y <= fy; y++ {
+			for x := 0.0; x <= fx; x++ {
+				if inner ||
+					x < 1 || x >= fx ||
+					y < 1 || y >= fy ||
+					z < 1 || z >= fz {
+					shape.AddXYZ(x, y, z)
+				}
+			}
+		}
+	}
+
+	// segments - it's O(N^2), but deliciously simple, works for inner and outer.
+	for i := 0; i < len(shape.Points)-1; i++ {
+		for j := i + 1; j < len(shape.Points); j++ {
+			a := shape.Points[i]
+			b := shape.Points[j]
+			// adjacent, connected points will be exactly 1 unit apart.
+			// non-adjacent will be at least Sqrt2 apart (diagonal on the same plane)
+			if a.Distance(b) < math.Sqrt2 {
+				shape.AddSegmentByPoints(a, b)
+			}
+		}
+	}
+	shape.Scale(w/fx, h/fy, d/fz)
+	shape.Translate(-w/2, -h/2, -d/2)
+
+	return shape
+}
+
 // GridPlane creates a 3d plane containing a grid.
 func GridPlane(w, d float64, rows, cols int) *Shape {
-	fcols := float64(cols)
-	frows := float64(rows)
 	shape := NewShape()
+	fx, fz := float64(rows), float64(cols)
 
-	// corners
-	shape.AddXYZ(-w/2, 0, -d/2)
-	shape.AddXYZ(w/2, 0, -d/2)
-	shape.AddXYZ(w/2, 0, d/2)
-	shape.AddXYZ(-w/2, 0, d/2)
-
-	// outside edges
-	shape.AddSegmentByIndex(0, 1)
-	shape.AddSegmentByIndex(1, 2)
-	shape.AddSegmentByIndex(2, 3)
-	shape.AddSegmentByIndex(3, 0)
-
-	// inner lines...
-	// columns
-	for i := 1.0; i < frows; i++ {
-		x := -w/2 + i/frows*w
-		p0 := NewPoint(x, 0, -d/2)
-		p1 := NewPoint(x, 0, d/2)
-		shape.AddPoint(p0)
-		shape.AddPoint(p1)
-		shape.AddSegmentByPoints(p0, p1)
+	// points
+	for z := 0.0; z <= fz; z++ {
+		for x := 0.0; x <= fx; x++ {
+			shape.AddXYZ(x, 0, z)
+		}
 	}
 
-	// inner lines...
-	// rows
-	for i := 1.0; i < fcols; i++ {
-		z := -d/2 + i/fcols*d
-		p0 := NewPoint(-w/2, 0, z)
-		p1 := NewPoint(w/2, 0, z)
-		shape.AddPoint(p0)
-		shape.AddPoint(p1)
-		shape.AddSegmentByPoints(p0, p1)
+	// segments - it's O(N^2), but deliciously simple, works for inner and outer.
+	for i := 0; i < len(shape.Points)-1; i++ {
+		for j := i + 1; j < len(shape.Points); j++ {
+			a := shape.Points[i]
+			b := shape.Points[j]
+			// adjacent, connected points will be exactly 1 unit apart.
+			// non-adjacent will be at least Sqrt2 apart (diagonal on the same plane)
+			if a.Distance(b) < math.Sqrt2 {
+				shape.AddSegmentByPoints(a, b)
+			}
+		}
 	}
+	shape.Scale(w/fx, 1, d/fz)
+	shape.Translate(-w/2, 0, -d/2)
+
 	return shape
 }
 
