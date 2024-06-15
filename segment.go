@@ -16,7 +16,7 @@ func (s *Segment) Stroke(width float64) {
 	world.Context.Save()
 	scale := (s.PointA.Scaling + s.PointB.Scaling) / 2
 	if s.PointA.Visible() && s.PointB.Visible() {
-		ApplyFog((s.PointA.Z + s.PointB.Z) / 2)
+		ApplyFogAndWaterLevel((s.PointA.Y+s.PointB.Y)/2, (s.PointA.Z+s.PointB.Z)/2)
 		world.Context.SetLineWidth(width * scale)
 		world.Context.MoveTo(s.PointA.Px, s.PointA.Py)
 		world.Context.LineTo(s.PointB.Px, s.PointB.Py)
