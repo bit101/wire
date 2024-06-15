@@ -2,6 +2,8 @@
 package wire
 
 import (
+	"math"
+
 	"github.com/bit101/bitlib/blcolor"
 	"github.com/bit101/bitlib/blmath"
 	"github.com/bit101/bitlib/geom"
@@ -26,37 +28,43 @@ type Context interface {
 }
 
 type worldDef struct {
-	FL          float64
-	CX, CY, CZ  float64
-	NearZ, FarZ float64
-	FogActive   bool
-	NearFog     float64
-	FarFog      float64
-	R, G, B     float64
-	Context     Context
-	Font        FontType
-	FontSize    float64
-	FontSpacing float64
+	FL               float64
+	CX, CY, CZ       float64
+	NearZ, FarZ      float64
+	FogActive        bool
+	NearFog          float64
+	FarFog           float64
+	WaterLevelActive bool
+	WaterLevelTop    float64
+	WaterLevelBottom float64
+	R, G, B          float64
+	Context          Context
+	Font             FontType
+	FontSize         float64
+	FontSpacing      float64
 }
 
 // World contains the parameters for the 3d world.
 var world = worldDef{
-	FL:          300.0,
-	CX:          0.0,
-	CY:          0.0,
-	CZ:          0.0,
-	NearZ:       100.0,
-	FarZ:        100000.0,
-	FogActive:   false,
-	NearFog:     400.0,
-	FarFog:      1200.0,
-	R:           1,
-	G:           1,
-	B:           1,
-	Context:     nil,
-	Font:        FontAsteroid,
-	FontSize:    100,
-	FontSpacing: 0.2,
+	FL:               300.0,
+	CX:               0.0,
+	CY:               0.0,
+	CZ:               0.0,
+	NearZ:            100.0,
+	FarZ:             100000.0,
+	FogActive:        false,
+	NearFog:          400.0,
+	FarFog:           1200.0,
+	WaterLevelActive: false,
+	WaterLevelTop:    400.0,
+	WaterLevelBottom: 1200.0,
+	R:                1,
+	G:                1,
+	B:                1,
+	Context:          nil,
+	Font:             FontAsteroid,
+	FontSize:         100,
+	FontSpacing:      0.2,
 }
 
 // InitWorld initializes the world.
@@ -94,15 +102,29 @@ func SetClipping(near, far float64) {
 	world.FarZ = far
 }
 
-// ApplyFog returns the amount of fog to apply for the given object z.
-func ApplyFog(objectZ float64) {
+// ApplyFogAndWaterLevel sets the color to simulate an object receding into fog,
+// or being in water, or both.
+func ApplyFogAndWaterLevel(objectY, objectZ float64) {
 	fog := 1.0
 	if world.FogActive {
 		fog = blmath.Map(objectZ+world.CZ, world.NearFog, world.FarFog, 1, 0)
-		fog = blmath.Clamp(fog, 0, 1)
 	}
-	color := blcolor.RGBA(world.R, world.G, world.B, fog)
-	world.Context.SetSourceColor(color)
+	if world.WaterLevelActive {
+		fog = math.Min(fog, blmath.Map(objectY, world.WaterLevelTop, world.WaterLevelBottom, 1, 0))
+	}
+	fog = blmath.Clamp(fog, 0, 1)
+	if fog < 1 {
+		color := blcolor.RGBA(world.R, world.G, world.B, fog)
+		world.Context.SetSourceColor(color)
+	}
+}
+
+// SetWaterLevel sets the water level parameters, including turning on and off.
+// This is the same as fog but applied to the y axis.
+func SetWaterLevel(active bool, top, bottom float64) {
+	world.WaterLevelActive = active
+	world.WaterLevelTop = top
+	world.WaterLevelBottom = bottom
 }
 
 // SetFog sets the fog parameters, including turning on and off.

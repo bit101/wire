@@ -106,7 +106,7 @@ func (p PointList) RenderPoints(radius float64) {
 	for _, point := range p {
 		if point.Visible() {
 			world.Context.Save()
-			ApplyFog(point.Z)
+			ApplyFogAndWaterLevel(point.Y, point.Z)
 			world.Context.FillCircle(point.Px, point.Py, radius*point.Scaling)
 			world.Context.Restore()
 		}
