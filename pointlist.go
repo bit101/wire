@@ -363,24 +363,24 @@ func (p PointList) Normalize() {
 }
 
 // TwistX twists the points around the x axis.
-func (p PointList) TwistX(points PointList, amt float64) {
-	for _, p := range points {
+func (p PointList) TwistX(amt float64) {
+	for _, p := range p {
 		t := p.X * amt
 		p.RotateX(t)
 	}
 }
 
 // TwistY twists the points around the y axis.
-func (p PointList) TwistY(points PointList, amt float64) {
-	for _, p := range points {
+func (p PointList) TwistY(amt float64) {
+	for _, p := range p {
 		t := p.Y * amt
 		p.RotateY(t)
 	}
 }
 
 // TwistZ twists the points around the z axis.
-func (p PointList) TwistZ(points PointList, amt float64) {
-	for _, p := range points {
+func (p PointList) TwistZ(amt float64) {
+	for _, p := range p {
 		t := p.Z * amt
 		p.RotateZ(t)
 	}
