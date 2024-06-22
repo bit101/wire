@@ -272,12 +272,25 @@ func (s *Shape) Center() {
 	s.Points.Center()
 }
 
-// WrapCylinder wraps the x-axis of a shape around an imaginary cylinder laying along the z-axis.
-// radius is the radius of the cylinder. Assumes the object is at 0 on the y-axis.
-// arc controls how much the shape is wrapped.
-// t interpolates from unwrapped (0) to fully wrapped (1), useful for animating the wrapping.
-func (s *Shape) WrapCylinder(radius, arc, t float64) {
-	s.Points.WrapCylinder(radius, arc, t)
+// WrapCylinderWithArc wraps the x-axis of a shape around an imaginary cylinder laying
+// along the z-axis. The shape will retain its relative width, measured along the curve.
+// The radius of the cylindar will be dynamically computed.
+func (s *Shape) WrapCylinderWithArc(arc float64) {
+	s.Points.WrapCylinderWithArc(arc)
+}
+
+// WrapCylinderWithRadius wraps the x-axis of a shape around an imaginary cylinder laying
+// along the z-axis. The shape will retain its relative width, measured along the curve.
+// The resulting arc the shape covers will be dynamically computed.
+func (s *Shape) WrapCylinderWithRadius(radius float64) {
+	s.Points.WrapCylinderWithRadius(radius)
+}
+
+// WrapCylinderWithRadiusAndArc wraps the x-axis of a shape around an imaginary cylinder
+// laying along the z-axis. The shape will be stretched or compressed to fit in the given
+// arc and radius.
+func (s *Shape) WrapCylinderWithRadiusAndArc(radius, arc float64) {
+	s.Points.WrapCylinderWithRadiusAndArc(radius, arc)
 }
 
 // TwistX twists the shape around the x axis.

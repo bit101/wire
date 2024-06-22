@@ -232,16 +232,51 @@ func (p PointList) TwistZ(angle float64) {
 	}
 }
 
-// WrapCylinder wraps the x-axis of a point list around an imaginary cylinder laying along the z-axis.
-// radius is the radius of the cylinder. Assumes the object is at 0 on the y-axis.
-// arc controls how much the points are wrapped.
-// t interpolates from unwrapped (0) to fully wrapped (1), useful for animating the wrapping.
-func (p PointList) WrapCylinder(radius, arc, t float64) {
+// WrapCylinderWithArc wraps the x-axis of a point list around an imaginary cylinder laying
+// along the z-axis. The point list will retain its relative width, measured along the curve.
+// The radius of the cylinder will be dynamically computed.
+func (p PointList) WrapCylinderWithArc(arc float64) {
+	if arc == 0.0 {
+		return
+	}
+	w, _, _ := p.GetSize()
+	radius := w / arc
+	p.TranslateY(-radius)
+	for _, point := range p {
+		a := point.X / w * arc
+		point.X = 0
+		point.RotateZ(a)
+	}
+	p.TranslateY(radius)
+}
+
+// WrapCylinderWithRadius wraps the x-axis of a point list around an imaginary cylinder laying
+// along the z-axis. The point list will retain its relative width, measured along the curve.
+// The resulting arc the points cover will be dynamically computed.
+func (p PointList) WrapCylinderWithRadius(radius float64) {
+	if radius == 0.0 {
+		return
+	}
+	w, _, _ := p.GetSize()
+	arc := w / radius
+	p.TranslateY(-radius)
+	for _, point := range p {
+		a := point.X / w * arc
+		point.X = 0
+		point.RotateZ(a)
+	}
+	p.TranslateY(radius)
+}
+
+// WrapCylinderWithRadiusAndArc wraps the x-axis of a  point list around an imaginary cylinder
+// laying along the z-axis. The point list will be stretched or compressed to fit in the given
+// arc and radius.
+func (p PointList) WrapCylinderWithRadiusAndArc(radius, arc float64) {
 	p.TranslateY(-radius)
 	w, _, _ := p.GetSize()
 	for _, point := range p {
-		a := point.X / w * arc * t
-		point.X *= (1 - t)
+		a := point.X / w * arc
+		point.X = 0
 		point.RotateZ(a)
 	}
 	p.TranslateY(radius)
