@@ -3,6 +3,7 @@ package wire
 
 import (
 	"log"
+	"math"
 	"slices"
 
 	"github.com/bit101/bitlib/noise"
@@ -204,6 +205,84 @@ func (p *PointList) SortZ(ascending bool) {
 	})
 }
 
+// TwistX twists the points around the x axis.
+func (p PointList) TwistX(angle float64) {
+	w, _, _ := p.GetSize()
+	for _, point := range p {
+		t := point.X / w * angle
+		point.RotateX(t)
+	}
+}
+
+// TwistY twists the points around the y axis.
+func (p PointList) TwistY(angle float64) {
+	_, h, _ := p.GetSize()
+	for _, point := range p {
+		t := point.Y / h * angle
+		point.RotateY(t)
+	}
+}
+
+// TwistZ twists the points around the z axis.
+func (p PointList) TwistZ(angle float64) {
+	_, _, d := p.GetSize()
+	for _, point := range p {
+		t := point.Z / d * angle
+		point.RotateZ(t)
+	}
+}
+
+// WrapCylinder wraps the x-axis of a point list around an imaginary cylinder laying along the z-axis.
+// radius is the radius of the cylinder. Assumes the object is at 0 on the y-axis.
+// arc controls how much the points are wrapped.
+// t interpolates from unwrapped (0) to fully wrapped (1), useful for animating the wrapping.
+func (p PointList) WrapCylinder(radius, arc, t float64) {
+	p.TranslateY(-radius)
+	w, _, _ := p.GetSize()
+	for _, point := range p {
+		a := point.X / w * arc * t
+		point.X *= (1 - t)
+		point.RotateZ(a)
+	}
+	p.TranslateY(radius)
+}
+
+// GetSize returns the width, depth and height of a point list.
+func (p PointList) GetSize() (float64, float64, float64) {
+	minX, minY, minZ := math.MaxFloat64, math.MaxFloat64, math.MaxFloat64
+	maxX, maxY, maxZ := -math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64
+
+	for _, point := range p {
+		minX = math.Min(minX, point.X)
+		minY = math.Min(minY, point.Y)
+		minZ = math.Min(minZ, point.Z)
+		maxX = math.Max(maxX, point.X)
+		maxY = math.Max(maxY, point.Y)
+		maxZ = math.Max(maxZ, point.Z)
+	}
+	return maxX - minX, maxY - minY, maxZ - minZ
+}
+
+// Center centers the point list on all axes.
+func (p PointList) Center() {
+	minX, minY, minZ := math.MaxFloat64, math.MaxFloat64, math.MaxFloat64
+	maxX, maxY, maxZ := -math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64
+
+	for _, point := range p {
+		minX = math.Min(minX, point.X)
+		minY = math.Min(minY, point.Y)
+		minZ = math.Min(minZ, point.Z)
+		maxX = math.Max(maxX, point.X)
+		maxY = math.Max(maxY, point.Y)
+		maxZ = math.Max(maxZ, point.Z)
+	}
+	p.Translate(
+		-minX-(maxX-minX)/2,
+		-minY-(maxY-minY)/2,
+		-minZ-(maxZ-minZ)/2,
+	)
+}
+
 //////////////////////////////
 // Transform in place.
 //////////////////////////////
@@ -359,30 +438,6 @@ func (p PointList) Noisify(origin *Point, scale, offset float64) {
 func (p PointList) Normalize() {
 	for _, point := range p {
 		point.Normalize()
-	}
-}
-
-// TwistX twists the points around the x axis.
-func (p PointList) TwistX(amt float64) {
-	for _, p := range p {
-		t := p.X * amt
-		p.RotateX(t)
-	}
-}
-
-// TwistY twists the points around the y axis.
-func (p PointList) TwistY(amt float64) {
-	for _, p := range p {
-		t := p.Y * amt
-		p.RotateY(t)
-	}
-}
-
-// TwistZ twists the points around the z axis.
-func (p PointList) TwistZ(amt float64) {
-	for _, p := range p {
-		t := p.Z * amt
-		p.RotateZ(t)
 	}
 }
 

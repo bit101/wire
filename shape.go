@@ -140,6 +140,11 @@ func (s *Shape) AddRandomPointInTorus(radius1, radius2, arc float64) {
 	s.AddPoint(RandomPointInTorus(radius1, radius2, arc))
 }
 
+// GetSize returns the width, depth and height of a shape.
+func (s *Shape) GetSize() (float64, float64, float64) {
+	return s.Points.GetSize()
+}
+
 // Clone returns a deep copy of this shape.
 func (s *Shape) Clone() *Shape {
 	clone := NewShape()
@@ -262,23 +267,32 @@ func (s *Shape) Split(split func(p *Point) bool) *Shape {
 	return newShape
 }
 
+// Center centers the shape on all axes.
 func (s *Shape) Center() {
-	minX, minY, minZ := math.MaxFloat64, math.MaxFloat64, math.MaxFloat64
-	maxX, maxY, maxZ := -math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64
+	s.Points.Center()
+}
 
-	for _, p := range s.Points {
-		minX = math.Min(minX, p.X)
-		minY = math.Min(minY, p.Y)
-		minZ = math.Min(minZ, p.Z)
-		maxX = math.Max(maxX, p.X)
-		maxY = math.Max(maxY, p.Y)
-		maxZ = math.Max(maxZ, p.Z)
-	}
-	s.Points.Translate(
-		-minX-(maxX-minX)/2,
-		-minY-(maxY-minY)/2,
-		-minZ-(maxZ-minZ)/2,
-	)
+// WrapCylinder wraps the x-axis of a shape around an imaginary cylinder laying along the z-axis.
+// radius is the radius of the cylinder. Assumes the object is at 0 on the y-axis.
+// arc controls how much the shape is wrapped.
+// t interpolates from unwrapped (0) to fully wrapped (1), useful for animating the wrapping.
+func (s *Shape) WrapCylinder(radius, arc, t float64) {
+	s.Points.WrapCylinder(radius, arc, t)
+}
+
+// TwistX twists the shape around the x axis.
+func (s *Shape) TwistX(amt float64) {
+	s.Points.TwistX(amt)
+}
+
+// TwistY twists the shape around the y axis.
+func (s *Shape) TwistY(amt float64) {
+	s.Points.TwistY(amt)
+}
+
+// TwistZ twists the shape around the z axis.
+func (s *Shape) TwistZ(amt float64) {
+	s.Points.TwistZ(amt)
 }
 
 //////////////////////////////
