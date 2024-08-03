@@ -5,6 +5,7 @@ import (
 	"math"
 	"slices"
 
+	"github.com/bit101/bitlib/blmath"
 	"github.com/bit101/bitlib/geom"
 )
 
@@ -518,4 +519,34 @@ func (s *Shape) Randomized(amount float64) *Shape {
 	s1 := s.Clone()
 	s1.Randomize(amount)
 	return s1
+}
+
+// ConvexHull3d returns a new shape consisting of a stack of convex hulls oriented along the y axis.
+// dy determines the distance on the y access between each slice.
+func (s *Shape) ConvexHull3d(dy float64) *Shape {
+	newShape := NewShape()
+	shape := s.Clone()
+	shape.Center()
+
+	_, h, _ := shape.GetSize()
+	for y := -h / 2; y <= h/2; y += dy {
+		s := NewShape()
+		list := geom.NewPointList()
+		for _, p := range shape.Points {
+			if blmath.Equalish(y, p.Y, dy/2) {
+				list.AddXY(p.X, p.Z)
+			}
+		}
+		if len(list) > 3 {
+			list = geom.ConvexHull(list)
+			for _, p := range list {
+				s.AddXYZ(p.X, y, p.Y)
+			}
+			for i := 0; i < len(s.Points); i++ {
+				s.AddSegmentByIndex(i, (i+1)%len(s.Points))
+			}
+			newShape.AddShape(s)
+		}
+	}
+	return newShape
 }
