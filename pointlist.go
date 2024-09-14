@@ -104,11 +104,14 @@ func (p PointList) Project() {
 // RenderPoints projects and draws a circle for each point in the list.
 func (p PointList) RenderPoints(radius float64) {
 	p.Project()
-	for _, point := range p {
+	for i, point := range p {
 		if point.Visible() {
 			world.Context.Save()
 			ApplyFogAndWaterLevel(point.Y, point.Z)
 			world.Context.FillCircle(point.Px, point.Py, radius*point.Scaling)
+			if world.LabelPoints {
+				world.Context.FillTextAny(i, point.Px+5, point.Py-5)
+			}
 			world.Context.Restore()
 		}
 	}

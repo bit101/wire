@@ -334,3 +334,190 @@ func TorusKnot(p, q, r1, r2, res float64) *Shape {
 	}
 	return shape
 }
+
+//////////////////////////////
+// Platonic Solids!!!
+//////////////////////////////
+
+// Tetrahedron creates a tetrahedron shape.
+func Tetrahedron(size float64) *Shape {
+	model := NewShape()
+	model.AddXYZ(math.Sqrt(8.0/9.0), 0, -1.0/3.0)
+	model.AddXYZ(-math.Sqrt(2.0/9.0), math.Sqrt(2.0/3.0), -1.0/3.0)
+	model.AddXYZ(-math.Sqrt(2.0/9.0), -math.Sqrt(2.0/3.0), -1.0/3.0)
+	model.AddXYZ(0, 0, 1)
+	model.AddSegmentByIndex(0, 1)
+	model.AddSegmentByIndex(0, 2)
+	model.AddSegmentByIndex(0, 3)
+	model.AddSegmentByIndex(1, 2)
+	model.AddSegmentByIndex(1, 3)
+	model.AddSegmentByIndex(2, 3)
+	model.RotateX(-math.Pi / 2)
+
+	model.UniScale(size)
+	return model
+}
+
+// Cube creates a cube shape.
+func Cube(size float64) *Shape {
+	return Box(size, size, size)
+}
+
+// Octahedron creates an octahedron shape.
+func Octahedron(size float64) *Shape {
+	model := NewShape()
+	model.AddXYZ(-1, 0, 0)
+	model.AddXYZ(0, -1, 0)
+	model.AddXYZ(0, 0, -1)
+	model.AddXYZ(0, 1, 0)
+	model.AddXYZ(0, 0, 1)
+	model.AddXYZ(1, 0, 0)
+	model.AddSegmentByIndex(0, 1)
+	model.AddSegmentByIndex(0, 2)
+	model.AddSegmentByIndex(0, 3)
+	model.AddSegmentByIndex(0, 4)
+	model.AddSegmentByIndex(1, 2)
+	model.AddSegmentByIndex(2, 3)
+	model.AddSegmentByIndex(3, 4)
+	model.AddSegmentByIndex(4, 1)
+	model.AddSegmentByIndex(1, 5)
+	model.AddSegmentByIndex(2, 5)
+	model.AddSegmentByIndex(3, 5)
+	model.AddSegmentByIndex(4, 5)
+
+	model.UniScale(size)
+	return model
+}
+
+// Dodecahedron creates a dodecahedron shape.
+func Dodecahedron(size float64) *Shape {
+	phi := math.Phi
+	model := NewShape()
+	model.AddXYZ(-1, -1, -1)
+	model.AddXYZ(-1, -1, 1)
+	model.AddXYZ(-1, 1, -1)
+	model.AddXYZ(-1, 1, 1)
+	model.AddXYZ(1, -1, -1)
+	model.AddXYZ(1, -1, 1)
+	model.AddXYZ(1, 1, -1)
+	model.AddXYZ(1, 1, 1)
+
+	model.AddXYZ(0, -phi, -1/phi)
+	model.AddXYZ(0, -phi, 1/phi)
+	model.AddXYZ(0, phi, -1/phi)
+	model.AddXYZ(0, phi, 1/phi)
+
+	model.AddXYZ(-1/phi, 0, -phi)
+	model.AddXYZ(-1/phi, 0, phi)
+	model.AddXYZ(1/phi, 0, -phi)
+	model.AddXYZ(1/phi, 0, phi)
+
+	model.AddXYZ(-phi, -1/phi, 0)
+	model.AddXYZ(-phi, 1/phi, 0)
+	model.AddXYZ(phi, -1/phi, 0)
+	model.AddXYZ(phi, 1/phi, 0)
+
+	model.AddSegmentByIndex(0, 8)
+	model.AddSegmentByIndex(0, 12)
+	model.AddSegmentByIndex(0, 16)
+
+	model.AddSegmentByIndex(1, 9)
+	model.AddSegmentByIndex(1, 13)
+	model.AddSegmentByIndex(1, 16)
+
+	model.AddSegmentByIndex(2, 10)
+	model.AddSegmentByIndex(2, 12)
+	model.AddSegmentByIndex(2, 17)
+
+	model.AddSegmentByIndex(3, 11)
+	model.AddSegmentByIndex(3, 13)
+	model.AddSegmentByIndex(3, 17)
+
+	model.AddSegmentByIndex(4, 8)
+	model.AddSegmentByIndex(4, 14)
+	model.AddSegmentByIndex(4, 18)
+
+	model.AddSegmentByIndex(5, 9)
+	model.AddSegmentByIndex(5, 15)
+	model.AddSegmentByIndex(5, 18)
+
+	model.AddSegmentByIndex(6, 10)
+	model.AddSegmentByIndex(6, 14)
+	model.AddSegmentByIndex(6, 19)
+
+	model.AddSegmentByIndex(7, 11)
+	model.AddSegmentByIndex(7, 15)
+	model.AddSegmentByIndex(7, 19)
+
+	model.AddSegmentByIndex(8, 9)
+	model.AddSegmentByIndex(10, 11)
+	model.AddSegmentByIndex(12, 14)
+	model.AddSegmentByIndex(13, 15)
+	model.AddSegmentByIndex(16, 17)
+	model.AddSegmentByIndex(18, 19)
+
+	model.UniScale(size)
+	return model
+}
+
+// Icosahedron creates an icosahedron shape.
+func Icosahedron(size float64) *Shape {
+	phi := math.Phi
+	model := NewShape()
+	model.AddXYZ(0, -1, -phi)
+	model.AddXYZ(0, -1, phi)
+	model.AddXYZ(0, 1, -phi)
+	model.AddXYZ(0, 1, phi)
+
+	model.AddXYZ(-1, -phi, 0)
+	model.AddXYZ(-1, phi, 0)
+	model.AddXYZ(1, -phi, 0)
+	model.AddXYZ(1, phi, 0)
+
+	model.AddXYZ(-phi, 0, -1)
+	model.AddXYZ(-phi, 0, 1)
+	model.AddXYZ(phi, 0, -1)
+	model.AddXYZ(phi, 0, 1)
+
+	model.AddSegmentByIndex(0, 2)
+	model.AddSegmentByIndex(0, 4)
+	model.AddSegmentByIndex(0, 6)
+	model.AddSegmentByIndex(0, 8)
+	model.AddSegmentByIndex(0, 10)
+
+	model.AddSegmentByIndex(1, 3)
+	model.AddSegmentByIndex(1, 4)
+	model.AddSegmentByIndex(1, 6)
+	model.AddSegmentByIndex(1, 9)
+	model.AddSegmentByIndex(1, 11)
+
+	model.AddSegmentByIndex(2, 5)
+	model.AddSegmentByIndex(2, 7)
+	model.AddSegmentByIndex(2, 8)
+	model.AddSegmentByIndex(2, 10)
+
+	model.AddSegmentByIndex(3, 5)
+	model.AddSegmentByIndex(3, 7)
+	model.AddSegmentByIndex(3, 9)
+	model.AddSegmentByIndex(3, 11)
+
+	model.AddSegmentByIndex(4, 6)
+	model.AddSegmentByIndex(4, 8)
+	model.AddSegmentByIndex(4, 9)
+
+	model.AddSegmentByIndex(5, 7)
+	model.AddSegmentByIndex(5, 8)
+	model.AddSegmentByIndex(5, 9)
+
+	model.AddSegmentByIndex(6, 10)
+	model.AddSegmentByIndex(6, 11)
+
+	model.AddSegmentByIndex(7, 10)
+	model.AddSegmentByIndex(7, 11)
+
+	model.AddSegmentByIndex(8, 9)
+	model.AddSegmentByIndex(10, 11)
+
+	model.UniScale(size)
+	return model
+}
