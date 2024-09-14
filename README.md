@@ -43,6 +43,12 @@ That said, these constraints make space for a good amount of creativity in multi
   - GridPlane
   - Spring
   - Text
+  - Platonic Solids:
+    - Tetrahedron
+    - Cube
+    - Octahedron
+    - Dodecahedron
+    - Icosohedron
 - Where it makes sense, most of these can be rendered as:
   - Wireframe, with configurable longitudinal and latitudinal sections
   - Random points on the surface
@@ -55,6 +61,29 @@ That said, these constraints make space for a good amount of creativity in multi
   - Subdivided
   - Randomized
   - Noisified (Simplex noise)
+
+## Usage
+
+```
+// expected: you have a *cairo.Context from blcairo
+// 1. Init wire with the context and origin location:
+wire.InitWorld(context, centerX, centerY, centerZ)
+
+// 2. Set other (optional) world settings:
+wire.SetPerspective(500)
+wire.SetFog(true, 500, 1000)
+
+// 3. Create a shape:
+model := wire.Sphere(200, 12, 12, true, true)
+
+// 4. Transform model as desired:
+model.ScaleX(2.0)
+model.RotateY(math.Pi/2)
+
+// 5. Render points and/or edges:
+model.Stroke(1)
+model.RenderPoints(2)
+```
 
 ## Examples
 
