@@ -25,6 +25,7 @@ type Context interface {
 	Restore()
 	SetSourceColor(blcolor.Color)
 	GetSourceRGB() (float64, float64, float64)
+	FillTextAny(text any, x, y float64)
 }
 
 type worldDef struct {
@@ -42,6 +43,7 @@ type worldDef struct {
 	Font             FontType
 	FontSize         float64
 	FontSpacing      float64
+	LabelPoints      bool
 }
 
 // World contains the parameters for the 3d world.
@@ -65,6 +67,7 @@ var world = worldDef{
 	Font:             FontAsteroid,
 	FontSize:         100,
 	FontSpacing:      0.2,
+	LabelPoints:      false,
 }
 
 // InitWorld initializes the world.
@@ -159,4 +162,9 @@ func SetFontSize(size float64) {
 // Default is 0.2.
 func SetFontSpacing(spacing float64) {
 	world.FontSpacing = spacing
+}
+
+// LabelPoints will render the index of each point - usually for debugging purposes.
+func LabelPoints(b bool) {
+	world.LabelPoints = b
 }
